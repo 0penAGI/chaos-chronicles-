@@ -2,13 +2,14 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ХРОНИКИ ТРАГЕДИИ СЛАЙДОВ</title>
 <style>
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
   
   body {
@@ -19,6 +20,7 @@
     color: #FFFFFF;
     overflow: hidden;
     height: 100vh;
+    touch-action: manipulation;
   }
   
   @keyframes chaosGradient {
@@ -34,52 +36,72 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    padding: 10px;
+  }
+  
+  #stats-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 10px;
+  }
+  
+  #timer {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00FF00;
+    text-shadow: 0 0 10px #00FF00;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 10px;
   }
   
   #chaos-meter {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     color: #FF0000;
-    text-shadow: 0 0 10px #FF0000, 0 0 20px #FF0000;
+    text-shadow: 0 0 10px #FF0000;
     animation: pulse 0.5s infinite;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 10px;
   }
   
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+    50% { transform: scale(1.1); }
   }
   
-  #timer {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 48px;
-    font-weight: bold;
-    color: #00FF00;
-    text-shadow: 0 0 20px #00FF00;
+  #score-display {
+    font-size: 20px;
+    color: #00FFFF;
+    text-shadow: 0 0 10px #00FFFF;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 10px;
   }
   
   #game-scene {
-    width: 80%;
+    width: 100%;
     max-width: 800px;
-    height: 500px;
+    height: 60vh;
+    min-height: 400px;
     background: rgba(247, 215, 212, 0.1);
-    border: 3px solid #FF5D2E;
-    box-shadow: 0 0 30px rgba(255, 93, 46, 0.8), inset 0 0 50px rgba(0, 0, 0, 0.5);
-    padding: 20px;
+    border: 2px solid #FF5D2E;
+    box-shadow: 0 0 20px rgba(255, 93, 46, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5);
+    padding: 15px;
     position: relative;
     overflow: hidden;
     animation: sceneShake 0.3s infinite;
+    border-radius: 10px;
   }
   
   @keyframes sceneShake {
     0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(-2px, 2px) rotate(-0.5deg); }
-    50% { transform: translate(2px, -2px) rotate(0.5deg); }
-    75% { transform: translate(-2px, -2px) rotate(-0.5deg); }
+    25% { transform: translate(-1px, 1px) rotate(-0.3deg); }
+    50% { transform: translate(1px, -1px) rotate(0.3deg); }
+    75% { transform: translate(-1px, -1px) rotate(-0.3deg); }
   }
   
   #scene-content {
@@ -90,32 +112,55 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   #scene-title {
-    font-size: 48px;
+    font-size: 28px;
     font-weight: bold;
     color: #FFD700;
-    text-shadow: 0 0 20px #FFD700, 0 0 40px #FF5D2E;
-    margin-bottom: 30px;
+    text-shadow: 0 0 10px #FFD700, 0 0 20px #FF5D2E;
+    margin-bottom: 15px;
     animation: titleGlitch 1s infinite;
+    text-align: center;
   }
   
   @keyframes titleGlitch {
     0%, 90%, 100% { transform: translate(0, 0); }
-    92% { transform: translate(-5px, 2px); }
-    94% { transform: translate(5px, -2px); }
-    96% { transform: translate(-3px, -3px); }
+    92% { transform: translate(-3px, 1px); }
+    94% { transform: translate(3px, -1px); }
+    96% { transform: translate(-2px, -2px); }
+  }
+  
+  .scene-description {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+    max-width: 95%;
+    line-height: 1.4;
+    color: #FFA500;
+    text-shadow: 0 0 5px #FFA500;
+  }
+  
+  #buttons-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 50%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 5px;
   }
   
   .slide-button {
-    margin: 15px;
-    padding: 20px 40px;
-    font-size: 24px;
+    margin: 8px 0;
+    padding: 15px 10px;
+    font-size: 18px;
     font-weight: bold;
     background: linear-gradient(45deg, #FF0000, #FF5D2E, #FFD700);
     background-size: 200% 200%;
-    border: 3px solid #FFFFFF;
+    border: 2px solid #FFFFFF;
     color: #000000;
     cursor: pointer;
     transition: all 0.3s;
@@ -123,6 +168,13 @@
     animation: buttonPulse 2s infinite;
     position: relative;
     overflow: hidden;
+    border-radius: 8px;
+    width: 100%;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
   
   @keyframes buttonPulse {
@@ -130,30 +182,28 @@
     50% { background-position: 100% 50%; }
   }
   
-  .slide-button:hover {
-    transform: scale(1.2) rotate(3deg);
-    box-shadow: 0 0 40px #FF5D2E;
-  }
-  
   .slide-button:active {
-    transform: scale(0.9) rotate(-3deg);
+    transform: scale(0.95);
+    box-shadow: 0 0 20px #FF5D2E;
   }
   
   #alert-element {
     position: absolute;
-    bottom: 30px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 28px;
+    font-size: 18px;
     font-weight: bold;
     color: #FF0000;
-    text-shadow: 0 0 10px #FF0000, 0 0 20px #FFFFFF;
+    text-shadow: 0 0 5px #FF0000, 0 0 10px #FFFFFF;
     text-align: center;
     animation: alertBlink 0.5s infinite;
-    padding: 15px 30px;
+    padding: 10px 15px;
     background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #FF0000;
-    border-radius: 10px;
+    border: 1px solid #FF0000;
+    border-radius: 8px;
+    width: 95%;
+    max-width: 500px;
   }
   
   @keyframes alertBlink {
@@ -163,8 +213,8 @@
   
   .particle {
     position: absolute;
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     background: #FFD700;
     border-radius: 50%;
     pointer-events: none;
@@ -173,17 +223,7 @@
   
   @keyframes particleFloat {
     0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-500px) scale(0); opacity: 0; }
-  }
-  
-  #score-display {
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 32px;
-    color: #00FFFF;
-    text-shadow: 0 0 10px #00FFFF;
+    100% { transform: translateY(-300px) scale(0); opacity: 0; }
   }
   
   .wrong-choice {
@@ -192,25 +232,195 @@
   
   @keyframes wrongShake {
     0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-    20%, 40%, 60%, 80% { transform: translateX(10px); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  
+  .choice-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px 25px;
+    border-radius: 8px;
+    z-index: 100;
+    animation: feedbackPulse 1s;
+    text-align: center;
+    width: 80%;
+  }
+  
+  @keyframes feedbackPulse {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  
+  .correct-feedback {
+    background: rgba(0, 255, 0, 0.8);
+    color: #000;
+    border: 2px solid #00FF00;
+  }
+  
+  .wrong-feedback {
+    background: rgba(255, 0, 0, 0.8);
+    color: #FFF;
+    border: 2px solid #FF0000;
+  }
+  
+  #achievements {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #FFD700;
+    max-width: 150px;
+    display: none; /* Скрываем на мобильных по умолчанию */
+  }
+  
+  .achievement {
+    font-size: 12px;
+    margin: 3px 0;
+    color: #FFD700;
+  }
+  
+  .achievement.unlocked {
+    text-shadow: 0 0 3px #FFD700;
+  }
+  
+  .achievement.locked {
+    color: #666;
+  }
+  
+  #chaos-visual {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .chaos-element {
+    position: absolute;
+    opacity: 0;
+    animation: chaosElement 3s infinite;
+  }
+  
+  @keyframes chaosElement {
+    0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+    50% { opacity: 0.2; transform: scale(1) rotate(180deg); }
+  }
+  
+  /* Адаптация для очень маленьких экранов */
+  @media (max-height: 700px) {
+    #game-scene {
+      height: 55vh;
+      min-height: 350px;
+    }
+    
+    .scene-description {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    
+    .slide-button {
+      padding: 12px 8px;
+      font-size: 16px;
+      min-height: 50px;
+    }
+    
+    #scene-title {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+  }
+  
+  @media (max-width: 350px) {
+    #stats-container {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    #timer, #chaos-meter, #score-display {
+      margin: 2px;
+      font-size: 16px;
+    }
+    
+    #scene-title {
+      font-size: 22px;
+    }
+    
+    .scene-description {
+      font-size: 14px;
+    }
+    
+    .slide-button {
+      font-size: 16px;
+      min-height: 45px;
+    }
+  }
+  
+  /* Горизонтальная ориентация */
+  @media (max-height: 500px) and (orientation: landscape) {
+    #game-container {
+      flex-direction: row;
+      padding: 5px;
+    }
+    
+    #stats-container {
+      flex-direction: column;
+      width: auto;
+      margin-bottom: 0;
+      margin-right: 10px;
+    }
+    
+    #game-scene {
+      height: 95vh;
+      width: 70%;
+    }
+    
+    #timer, #chaos-meter, #score-display {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    
+    #alert-element {
+      bottom: 5px;
+      font-size: 16px;
+    }
   }
 </style>
 </head>
 <body>
 <div id="game-container">
-  <div id="timer">⏱️ <span id="time-value">0</span>с</div>
-  <div id="chaos-meter">🔥 ХАОС: <span id="chaos-value">0</span>%</div>
-  <div id="score-display">💀 БАЛЛЫ: <span id="score-value">0</span></div>
+  <div id="stats-container">
+    <div id="timer">⏱️ <span id="time-value">0</span>с</div>
+    <div id="chaos-meter">🔥 ХАОС: <span id="chaos-value">0</span>%</div>
+    <div id="score-display">💀 <span id="score-value">0</span></div>
+  </div>
   
   <div id="game-scene">
     <div id="scene-content">
       <div id="scene-title">НАЧАЛО КОНЦА</div>
+      <div id="scene-description" class="scene-description"></div>
       <div id="buttons-container"></div>
     </div>
   </div>
   
   <div id="alert-element">⚠️ НАЧИНАЕТСЯ ХАОС! ⚠️</div>
+  
+  <div id="achievements">
+    <div class="achievement locked">🔒 Первый шаг</div>
+    <div class="achievement locked">🔒 Мастер хаоса</div>
+    <div class="achievement locked">🔒 Победитель энтропии</div>
+  </div>
+  
+  <div id="chaos-visual"></div>
 </div>
 
 <script>
@@ -220,35 +430,45 @@
   let score = 0;
   let timeElapsed = 0;
   let isGameOver = false;
+  let achievements = {
+    firstStep: false,
+    chaosMaster: false,
+    entropyWinner: false
+  };
   
   // СЦЕНЫ ТРАГЕДИИ
   const scenes = [
     {
       title: "НАЧАЛО КОНЦА",
+      description: "Вы стоите на пороге реальности, чувствуя, как ткань бытия начинает распадаться. Время и пространство искажаются вокруг вас.",
       choices: ["🚪 Войти в портал", "🏃 Убежать от судьбы", "💀 Принять хаос"],
       correctIndex: 2,
       messages: ["Трусость не спасёт!", "Судьба настигнет!", "ВЫ ПРИНЯЛИ ХАОС!"]
     },
     {
       title: "БЕЗДНА ВОПИТ",
+      description: "Перед вами разверзлась бездна, наполненная шепотом забытых миров. Её голос проникает в самое сознание.",
       choices: ["👁️ Смотреть в бездну", "🔥 Сжечь реальность", "❄️ Заморозить время"],
       correctIndex: 0,
       messages: ["Реальность устояла!", "Время не подвластно!", "БЕЗДНА СМОТРИТ НАЗАД!"]
     },
     {
       title: "ТАНЕЦ ЭНТРОПИИ",
+      description: "Вселенная танцует свой последний танец. Частицы материи распадаются в ритме вселенской симфонии разрушения.",
       choices: ["💃 Танцевать с хаосом", "⚡ Стать молнией", "🌊 Утонуть в волнах"],
       correctIndex: 0,
       messages: ["Молния ударила в вас!", "Волны поглотили!", "ВЫ СТАЛИ ХАОСОМ!"]
     },
     {
       title: "ЭХО РАЗРУШЕНИЯ",
+      description: "Отголоски ваших решений разносятся по рушащейся реальности. Каждое действие создает новые миры и уничтожает старые.",
       choices: ["🎭 Снять маску", "🎪 Войти в цирк", "🎨 Нарисовать выход"],
       correctIndex: 2,
       messages: ["Лицо растворилось!", "Цирк не отпускает!", "ВЫХОД СОЗДАН!"]
     },
     {
       title: "ФИНАЛЬНЫЙ КОЛЛАПС",
+      description: "Реальность сжимается в точку. Последние моменты существования подходят к концу. Что выберете в финале?",
       choices: ["⭐ Стать звездой", "🌑 Погаснуть навсегда", "♾️ Войти в петлю"],
       correctIndex: 0,
       messages: ["Тьма поглотила!", "Петля бесконечна!", "ВЫ ВЗОРВАЛИСЬ КАК СВЕРХНОВАЯ!"]
@@ -257,12 +477,15 @@
   
   // ЭЛЕМЕНТЫ
   const sceneTitle = document.getElementById('scene-title');
+  const sceneDescription = document.getElementById('scene-description');
   const buttonsContainer = document.getElementById('buttons-container');
   const alertElement = document.getElementById('alert-element');
   const chaosValue = document.getElementById('chaos-value');
   const scoreValue = document.getElementById('score-value');
   const timeValue = document.getElementById('time-value');
   const gameScene = document.getElementById('game-scene');
+  const chaosVisual = document.getElementById('chaos-visual');
+  const achievementElements = document.querySelectorAll('.achievement');
   
   // ФУНКЦИИ ХАОСА
   function createParticles() {
@@ -272,6 +495,26 @@
     particle.style.animationDelay = Math.random() * 2 + 's';
     document.getElementById('game-container').appendChild(particle);
     setTimeout(() => particle.remove(), 2000);
+  }
+  
+  function updateChaosVisual() {
+    chaosVisual.innerHTML = '';
+    const elementCount = Math.floor(chaosLevel / 10);
+    
+    for (let i = 0; i < elementCount; i++) {
+      const element = document.createElement('div');
+      element.className = 'chaos-element';
+      element.style.left = Math.random() * 100 + '%';
+      element.style.top = Math.random() * 100 + '%';
+      element.style.width = Math.random() * 50 + 30 + 'px';
+      element.style.height = Math.random() * 50 + 30 + 'px';
+      element.style.background = `radial-gradient(circle, 
+        rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7), 
+        transparent)`;
+      element.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+      element.style.animationDelay = Math.random() * 3 + 's';
+      chaosVisual.appendChild(element);
+    }
   }
   
   function updateChaos(increase = true) {
@@ -285,6 +528,17 @@
     if (chaosLevel > 50) {
       gameScene.style.animation = `sceneShake ${0.5 - (chaosLevel / 200)}s infinite`;
     }
+    
+    updateChaosVisual();
+    
+    // Достижения
+    if (chaosLevel >= 50 && !achievements.chaosMaster) {
+      achievements.chaosMaster = true;
+      achievementElements[1].classList.remove('locked');
+      achievementElements[1].classList.add('unlocked');
+      achievementElements[1].textContent = '✅ Мастер хаоса';
+      showAlert('ДОСТИЖЕНИЕ: Мастер хаоса!', 3000);
+    }
   }
   
   function loadScene(sceneIndex) {
@@ -295,6 +549,7 @@
     
     const scene = scenes[sceneIndex];
     sceneTitle.textContent = scene.title;
+    sceneDescription.textContent = scene.description;
     buttonsContainer.innerHTML = '';
     
     scene.choices.forEach((choice, index) => {
@@ -305,17 +560,50 @@
       buttonsContainer.appendChild(button);
     });
     
+    // Первое достижение
+    if (sceneIndex === 0 && !achievements.firstStep) {
+      achievements.firstStep = true;
+      achievementElements[0].classList.remove('locked');
+      achievementElements[0].classList.add('unlocked');
+      achievementElements[0].textContent = '✅ Первый шаг';
+    }
+    
     updateChaos(true);
     for (let i = 0; i < 5; i++) {
       setTimeout(createParticles, i * 200);
     }
   }
   
+  function showAlert(message, duration = 1500) {
+    alertElement.textContent = message;
+    setTimeout(() => {
+      if (!isGameOver) {
+        alertElement.textContent = '⚠️ ВЫБИРАЙТЕ МУДРО! ⚠️';
+      }
+    }, duration);
+  }
+  
+  function showFeedback(message, isCorrect) {
+    const feedback = document.createElement('div');
+    feedback.className = `choice-feedback ${isCorrect ? 'correct-feedback' : 'wrong-feedback'}`;
+    feedback.textContent = message;
+    document.getElementById('scene-content').appendChild(feedback);
+    
+    setTimeout(() => {
+      feedback.remove();
+    }, 1500);
+  }
+  
   function makeChoice(choiceIndex, scene) {
     if (isGameOver) return;
     
     const isCorrect = choiceIndex === scene.correctIndex;
-    alertElement.textContent = '⚠️ ' + scene.messages[choiceIndex] + ' ⚠️';
+    
+    // Показать сообщение выбора
+    showAlert('⚠️ ' + scene.messages[choiceIndex] + ' ⚠️');
+    
+    // Показать визуальную обратную связь
+    showFeedback(isCorrect ? '✓ ПРАВИЛЬНО!' : '✗ ОШИБКА!', isCorrect);
     
     if (isCorrect) {
       score += 100 + (chaosLevel * 2);
@@ -347,10 +635,20 @@
     
     if (victory) {
       sceneTitle.textContent = "🎆 ПОБЕДА! 🎆";
-      alertElement.textContent = `⭐ ВЫ ПОКОРИЛИ ХАОС! БАЛЛЫ: ${score} ⭐`;
+      sceneDescription.textContent = `Вы прошли через все испытания хаоса и вышли победителем! Ваши баллы: ${score}`;
+      showAlert(`⭐ ВЫ ПОКОРИЛИ ХАОС! БАЛЛЫ: ${score} ⭐`, 5000);
+      
+      // Достижение за победу
+      if (!achievements.entropyWinner) {
+        achievements.entropyWinner = true;
+        achievementElements[2].classList.remove('locked');
+        achievementElements[2].classList.add('unlocked');
+        achievementElements[2].textContent = '✅ Победитель энтропии';
+      }
     } else {
       sceneTitle.textContent = "💀 ХАОС ПОБЕДИЛ 💀";
-      alertElement.textContent = `☠️ ВЫ ПОГЛОЩЕНЫ ЭНТРОПИЕЙ! БАЛЛЫ: ${score} ☠️`;
+      sceneDescription.textContent = `Энтропия поглотила вас. Реальность распалась на частицы. Ваши баллы: ${score}`;
+      showAlert(`☠️ ВЫ ПОГЛОЩЕНЫ ЭНТРОПИЕЙ! БАЛЛЫ: ${score} ☠️`, 5000);
     }
     
     const restartButton = document.createElement('button');
@@ -385,7 +683,7 @@
   
   // СТАРТ ИГРЫ!
   loadScene(0);
-  alertElement.textContent = '⚠️ НАЧИНАЕТСЯ ХАОС! ВЫБИРАЙТЕ МУДРО! ⚠️';
+  showAlert('⚠️ НАЧИНАЕТСЯ ХАОС! ВЫБИРАЙТЕ МУДРО! ⚠️', 3000);
 </script>
 </body>
 </html>
