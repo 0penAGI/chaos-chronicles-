@@ -3,6 +3,1212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ХРОНИКИ ТРАГЕДИИ СЛАЙДОВ - УСОВЕРШЕНСТВОВАННАЯ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #000000, #1a0033, #330033, #000000);
+            background-size: 400% 400%;
+            animation: chaosGradient 8s ease infinite;
+            color: #FFFFFF;
+            overflow: hidden;
+            height: 100vh;
+            touch-action: manipulation;
+        }
+        
+        @keyframes chaosGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 10px;
+        }
+        
+        /* Улучшенная панель статистики */
+        #stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-item {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #timer { border-color: #00FF00; color: #00FF00; }
+        #chaos-meter { border-color: #FF0000; color: #FF0000; }
+        #score-display { border-color: #00FFFF; color: #00FFFF; }
+        
+        .stat-value {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+        
+        /* Улучшенная система комбо */
+        #combo-display {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px #FFD700, 0 0 20px #FF5D2E;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 8px 20px;
+            border-radius: 25px;
+            border: 2px solid #FFD700;
+            z-index: 10;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .combo-animation {
+            animation: comboPulse 0.3s infinite;
+        }
+        
+        @keyframes comboPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+        
+        /* Улучшенная игровая сцена */
+        #game-scene {
+            width: 100%;
+            max-width: 800px;
+            height: 60vh;
+            min-height: 400px;
+            background: rgba(247, 215, 212, 0.08);
+            border: 2px solid #FF5D2E;
+            box-shadow: 0 0 20px rgba(255, 93, 46, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .scene-shake {
+            animation: sceneShake 0.4s infinite;
+        }
+        
+        @keyframes sceneShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-1px, 1px) rotate(-0.2deg); }
+            50% { transform: translate(1px, -1px) rotate(0.2deg); }
+            75% { transform: translate(-1px, -1px) rotate(-0.2deg); }
+        }
+        
+        #scene-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #scene-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        #scene-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 8px #FFD700, 0 0 16px #FF5D2E;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        
+        .scene-description {
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.4;
+            color: #FFA500;
+            text-shadow: 0 0 4px #FFA500;
+            margin-bottom: 15px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+        
+        /* Улучшенные кнопки */
+        #buttons-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+            max-height: 45%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 5px;
+        }
+        
+        .slide-button {
+            padding: 14px 12px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FF0000, #FF5D2E, #FFD700);
+            background-size: 200% 200%;
+            border: 2px solid #FFFFFF;
+            color: #000000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 4px #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: buttonPulse 3s infinite;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% { background-position: 0% 50%; filter: brightness(1); }
+            50% { background-position: 100% 50%; filter: brightness(1.1); }
+        }
+        
+        .slide-button:active {
+            transform: scale(0.96);
+            box-shadow: 0 0 15px #FF5D2E;
+        }
+        
+        /* Улучшенная система способностей */
+        #powers-container {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+        }
+        
+        .power-button {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+        
+        .power-button:active:not(.disabled) {
+            transform: scale(0.9);
+        }
+        
+        .power-button.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        
+        .power-button.available {
+            border-color: #00FF00;
+            box-shadow: 0 0 10px #00FF00;
+        }
+        
+        .power-count {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: #FF0000;
+            color: #FFFFFF;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid #000;
+        }
+        
+        /* Новая система прогресса */
+        #progress-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #FFD700;
+            backdrop-filter: blur(5px);
+        }
+        
+        .progress-item {
+            font-size: 12px;
+            margin: 2px 0;
+            color: #FFD700;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF5D2E, #FFD700);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Улучшенные уведомления */
+        #alert-element {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: bold;
+            color: #FF0000;
+            text-shadow: 0 0 5px #FF0000, 0 0 8px #FFFFFF;
+            text-align: center;
+            padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #FF0000;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 500px;
+            backdrop-filter: blur(5px);
+            z-index: 5;
+        }
+        
+        .alert-success {
+            color: #00FF00;
+            border-color: #00FF00;
+            animation: alertPulse 1s infinite;
+        }
+        
+        @keyframes alertPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Система паузы */
+        #pause-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+        
+        #pause-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .pause-option {
+            margin: 15px 0;
+            padding: 15px 30px;
+            font-size: 20px;
+            background: linear-gradient(45deg, #FF5D2E, #FFD700);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Визуальные эффекты */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 2s infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-300px) scale(0); opacity: 0; }
+        }
+        
+        .choice-feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 100;
+            animation: feedbackPulse 1s;
+            text-align: center;
+            width: 80%;
+        }
+        
+        @keyframes feedbackPulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .correct-feedback {
+            background: rgba(0, 255, 0, 0.8);
+            color: #000;
+            border: 2px solid #00FF00;
+        }
+        
+        .wrong-feedback {
+            background: rgba(255, 0, 0, 0.8);
+            color: #FFF;
+            border: 2px solid #FF0000;
+        }
+        
+        #chaos-visual {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .chaos-element {
+            position: absolute;
+            opacity: 0;
+            animation: chaosElement 3s infinite;
+        }
+        
+        @keyframes chaosElement {
+            0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+            50% { opacity: 0.2; transform: scale(1) rotate(180deg); }
+        }
+        
+        /* Адаптация для мобильных устройств */
+        @media (max-height: 700px) {
+            #game-scene {
+                height: 55vh;
+                min-height: 350px;
+            }
+            
+            .scene-description {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .slide-button {
+                padding: 12px 10px;
+                font-size: 15px;
+                min-height: 50px;
+            }
+            
+            #scene-title {
+                font-size: 22px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #stats-container {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+            
+            .stat-item {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 6px 10px;
+            }
+            
+            .stat-value {
+                margin-top: 0;
+                font-size: 18px;
+            }
+            
+            #powers-container {
+                bottom: 10px;
+                left: 10px;
+            }
+            
+            .power-button {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-height: 500px) and (orientation: landscape) {
+            #game-container {
+                flex-direction: row;
+                padding: 5px;
+            }
+            
+            #stats-container {
+                flex-direction: column;
+                width: auto;
+                margin-bottom: 0;
+                margin-right: 10px;
+                grid-template-columns: 1fr;
+            }
+            
+            #game-scene {
+                height: 95vh;
+                width: 70%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="stats-container">
+            <div id="timer" class="stat-item">
+                ⏱️ ВРЕМЯ
+                <div class="stat-value" id="time-value">0</div>
+            </div>
+            <div id="chaos-meter" class="stat-item">
+                🔥 ХАОС
+                <div class="stat-value" id="chaos-value">0%</div>
+            </div>
+            <div id="score-display" class="stat-item">
+                💀 ОЧКИ
+                <div class="stat-value" id="score-value">0</div>
+            </div>
+        </div>
+        
+        <div id="combo-display">КОМБО: x<span id="combo-value">1</span></div>
+        
+        <div id="pause-button">⏸️</div>
+        
+        <div id="game-scene">
+            <div id="scene-content">
+                <div id="scene-header">
+                    <div id="scene-title">НАЧАЛО КОНЦА</div>
+                </div>
+                <div id="scene-description" class="scene-description"></div>
+                <div id="buttons-container"></div>
+            </div>
+        </div>
+        
+        <div id="alert-element">⚠️ ПОДГОТОВЬТЕСЬ К ХАОСУ! ⚠️</div>
+        
+        <div id="powers-container">
+            <div class="power-button" id="hint-power" data-power="hint">
+                💡
+                <div class="power-count" id="hint-count">3</div>
+            </div>
+            <div class="power-button" id="slow-power" data-power="slow">
+                ⏳
+                <div class="power-count" id="slow-count">2</div>
+            </div>
+            <div class="power-button" id="shield-power" data-power="shield">
+                🛡️
+                <div class="power-count" id="shield-count">2</div>
+            </div>
+        </div>
+        
+        <div id="progress-container">
+            <div class="progress-item">СЦЕНА: <span id="scene-number">1</span>/10</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="scene-progress" style="width: 10%"></div>
+            </div>
+            <div class="progress-item">СЛОЖНОСТЬ: <span id="difficulty-level">1</span></div>
+        </div>
+        
+        <div id="pause-menu">
+            <h2 style="color: #FFD700; margin-bottom: 30px; font-size: 28px;">ПАУЗА</h2>
+            <button class="pause-option" id="resume-button">ПРОДОЛЖИТЬ</button>
+            <button class="pause-option" id="restart-button">ЗАНОВО</button>
+            <button class="pause-option" id="menu-button">ГЛАВНОЕ МЕНЮ</button>
+        </div>
+        
+        <div id="chaos-visual"></div>
+    </div>
+
+    <script>
+        // УЛУЧШЕННЫЕ ПЕРЕМЕННЫЕ ХАОСА
+        let currentScene = 1;
+        let chaosLevel = 0;
+        let score = 0;
+        let timeElapsed = 0;
+        let isGameOver = false;
+        let isPaused = false;
+        let difficultyLevel = 1;
+        
+        // УЛУЧШЕННАЯ СИСТЕМА КОМБО И СПОСОБНОСТЕЙ
+        let comboCount = 0;
+        let comboMultiplier = 1;
+        let isChaosPaused = false;
+        let isShieldActive = false;
+        let shieldTimer = 0;
+        let slowTimeTimer = 0;
+        
+        // УЛУЧШЕННЫЕ СПОСОБНОСТИ
+        let powers = {
+            hint: { count: 3, element: null, cooldown: 0 },
+            slow: { count: 2, element: null, cooldown: 0 },
+            shield: { count: 2, element: null, cooldown: 0 }
+        };
+        
+        // УЛУЧШЕННЫЕ СЦЕНЫ С ВАРИАТИВНОСТЬЮ
+        const scenes = [
+            {
+                id: 1,
+                title: "🌀 НАЧАЛО КОНЦА",
+                description: "Вы стоите на пороге реальности, чувствуя, как ткань бытия начинает распадаться. Время и пространство искажаются вокруг вас.",
+                choices: ["🚪 Войти в портал", "🏃 Убежать от судьбы", "💀 Принять хаос"],
+                correctIndex: 2,
+                messages: ["Трусость не спасёт!", "Судьба настигнет!", "ВЫ ПРИНЯЛИ ХАОС!"],
+                chaosIncrease: 8
+            },
+            {
+                id: 2,
+                title: "👁️ БЕЗДНА ВОПИТ",
+                description: "Перед вами разверзлась бездна, наполненная шепотом забытых миров. Её голос проникает в самое сознание.",
+                choices: ["👁️ Смотреть в бездну", "🔥 Сжечь реальность", "❄️ Заморозить время"],
+                correctIndex: 0,
+                messages: ["Реальность устояла!", "Время не подвластно!", "БЕЗДНА СМОТРИТ НАЗАД!"],
+                chaosIncrease: 10
+            },
+            {
+                id: 3,
+                title: "💃 ТАНЕЦ ЭНТРОПИИ",
+                description: "Вселенная танцует свой последний танец. Частицы материи распадаются в ритме вселенской симфонии разрушения.",
+                choices: ["💃 Танцевать с хаосом", "⚡ Стать молнией", "🌊 Утонуть в волнах"],
+                correctIndex: 0,
+                messages: ["Молния ударила в вас!", "Волны поглотили!", "ВЫ СТАЛИ ХАОСОМ!"],
+                chaosIncrease: 12
+            },
+            {
+                id: 4,
+                title: "🎭 ЭХО РАЗРУШЕНИЯ",
+                description: "Отголоски ваших решений разносятся по рушащейся реальности. Каждое действие создает новые миры и уничтожает старые.",
+                choices: ["🎭 Снять маску", "🎪 Войти в цирк", "🎨 Нарисовать выход"],
+                correctIndex: 2,
+                messages: ["Лицо растворилось!", "Цирк не отпускает!", "ВЫХОД СОЗДАН!"],
+                chaosIncrease: 14
+            },
+            {
+                id: 5,
+                title: "🌑 ЗАТМЕНИЕ РАЗУМА",
+                description: "Ваш разум окутывает тьма. Тени прошлого и будущего сливаются в единый кошмар настоящего.",
+                choices: ["🕯️ Зажечь свечу", "🌅 Встретить рассвет", "🌌 Погрузиться во тьму"],
+                correctIndex: 1,
+                messages: ["Свеча погасла!", "Тьма поглотила!", "РАССВЕТ ПРОГНАЛ ТЕНИ!"],
+                chaosIncrease: 16
+            },
+            {
+                id: 6,
+                title: "⚡ БУРЯ ИЗМЕНЕНИЙ",
+                description: "Реальность разрывается штормом перемен. Каждая молния рождает новую вселенную и уничтожает старую.",
+                choices: ["⚡ Ловить молнии", "🌀 Войти в эпицентр", "🛡️ Укрыться от бури"],
+                correctIndex: 1,
+                messages: ["Молнии сожгли!", "Укрытие рухнуло!", "ВЫ СТАЛИ ЦЕНТРОМ БУРИ!"],
+                chaosIncrease: 18
+            },
+            {
+                id: 7,
+                title: "🔮 КРИСТАЛЛ СУДЕБ",
+                description: "Перед вами парит кристалл, в гранях которого отражаются все возможные реальности и судьбы.",
+                choices: ["🔮 Заглянуть в кристалл", "💎 Разбить иллюзии", "🌈 Поймать отражение"],
+                correctIndex: 0,
+                messages: ["Иллюзии разбились!", "Отражение ускользнуло!", "ВЫ УВИДЕЛИ ВСЕ СУДЬБЫ!"],
+                chaosIncrease: 20
+            },
+            {
+                id: 8,
+                title: "🌋 ИЗВЕРЖЕНИЕ ХАОСА",
+                description: "Хаос извергается из недр реальности, угрожая поглотить последние островки порядка.",
+                choices: ["🌋 Броситься в жерло", "🏔️ Взобраться на пик", "🌊 Переплыть лаву"],
+                correctIndex: 1,
+                messages: ["Жерло поглотило!", "Лава сожгла!", "ВЫ ПОДНЯЛИСЬ НАД ХАОСОМ!"],
+                chaosIncrease: 22
+            },
+            {
+                id: 9,
+                title: "⭐ РОЖДЕНИЕ СВЕРХНОВОЙ",
+                description: "Вы стоите в эпицентре космического взрыва, где рождаются и умирают звёзды.",
+                choices: ["⭐ Стать сверхновой", "🌠 Испустить свет", "💥 Взорваться вместе"],
+                correctIndex: 0,
+                messages: ["Свет погас!", "Взрыв поглотил!", "ВЫ СТАЛИ СВЕРХНОВОЙ!"],
+                chaosIncrease: 24
+            },
+            {
+                id: 10,
+                title: "♾️ БЕСКОНЕЧНАЯ ПЕТЛЯ",
+                description: "Реальность замыкается в петлю. Каждое решение ведёт к началу, но с новыми последствиями.",
+                choices: ["♾️ Войти в петлю", "⏩ Ускорить время", "⏹️ Остановить всё"],
+                correctIndex: 2,
+                messages: ["Петля затянула!", "Время ускорилось!", "ВЫ ОСТАНОВИЛИ БЕСКОНЕЧНОСТЬ!"],
+                chaosIncrease: 26
+            }
+        ];
+
+        // ЭЛЕМЕНТЫ
+        const sceneTitle = document.getElementById('scene-title');
+        const sceneDescription = document.getElementById('scene-description');
+        const buttonsContainer = document.getElementById('buttons-container');
+        const alertElement = document.getElementById('alert-element');
+        const chaosValue = document.getElementById('chaos-value');
+        const scoreValue = document.getElementById('score-value');
+        const timeValue = document.getElementById('time-value');
+        const gameScene = document.getElementById('game-scene');
+        const chaosVisual = document.getElementById('chaos-visual');
+        const comboDisplay = document.getElementById('combo-display');
+        const comboValue = document.getElementById('combo-value');
+        const sceneNumber = document.getElementById('scene-number');
+        const sceneProgress = document.getElementById('scene-progress');
+        const difficultyLevelElement = document.getElementById('difficulty-level');
+
+        // УЛУЧШЕННАЯ ИНИЦИАЛИЗАЦИЯ
+        function initializeGame() {
+            initializePowers();
+            initializePauseSystem();
+            loadScene(0);
+            startGameLoop();
+            showAlert('🌀 ПРИГОТОВЬТЕСЬ К ПУТЕШЕСТВИЮ В ХАОС! 🌀', 3000);
+        }
+
+        // УЛУЧШЕННАЯ СИСТЕМА ПАУЗЫ
+        function initializePauseSystem() {
+            const pauseButton = document.getElementById('pause-button');
+            const pauseMenu = document.getElementById('pause-menu');
+            const resumeButton = document.getElementById('resume-button');
+            const restartButton = document.getElementById('restart-button');
+            const menuButton = document.getElementById('menu-button');
+            
+            pauseButton.addEventListener('click', togglePause);
+            resumeButton.addEventListener('click', togglePause);
+            restartButton.addEventListener('click', () => location.reload());
+            menuButton.addEventListener('click', () => {
+                if (confirm('Вернуться в главное меню? Весь прогресс будет потерян.')) {
+                    location.reload();
+                }
+            });
+            
+            // Пауза при скрытии вкладки
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && !isGameOver && !isPaused) {
+                    togglePause();
+                }
+            });
+        }
+        
+        function togglePause() {
+            isPaused = !isPaused;
+            const pauseMenu = document.getElementById('pause-menu');
+            
+            if (isPaused) {
+                pauseMenu.style.display = 'flex';
+            } else {
+                pauseMenu.style.display = 'none';
+            }
+        }
+
+        // УЛУЧШЕННАЯ ИНИЦИАЛИЗАЦИЯ СПОСОБНОСТЕЙ
+        function initializePowers() {
+            powers.hint.element = document.getElementById('hint-power');
+            powers.slow.element = document.getElementById('slow-power');
+            powers.shield.element = document.getElementById('shield-power');
+            
+            // Добавляем обработчики событий для способностей
+            powers.hint.element.addEventListener('click', () => usePower('hint'));
+            powers.slow.element.addEventListener('click', () => usePower('slow'));
+            powers.shield.element.addEventListener('click', () => usePower('shield'));
+            
+            updatePowerButtons();
+        }
+        
+        // ОБНОВЛЕНИЕ КНОПОК СПОСОБНОСТЕЙ
+        function updatePowerButtons() {
+            for (const power in powers) {
+                const element = powers[power].element;
+                const countElement = element.querySelector('.power-count');
+                
+                countElement.textContent = powers[power].count;
+                
+                if (powers[power].count === 0) {
+                    element.classList.add('disabled');
+                    element.classList.remove('available');
+                } else {
+                    element.classList.remove('disabled');
+                    element.classList.add('available');
+                }
+            }
+        }
+        
+        // ИСПОЛЬЗОВАНИЕ СПОСОБНОСТИ
+        function usePower(powerType) {
+            if (powers[powerType].count <= 0 || isGameOver || isPaused) return;
+            
+            powers[powerType].count--;
+            updatePowerButtons();
+            
+            switch(powerType) {
+                case 'hint':
+                    useHintPower();
+                    break;
+                case 'slow':
+                    useSlowPower();
+                    break;
+                case 'shield':
+                    useShieldPower();
+                    break;
+            }
+            
+            // Виброотклик (если поддерживается)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        // СПОСОБНОСТЬ: ПОДСКАЗКА
+        function useHintPower() {
+            const currentSceneData = scenes[currentScene - 1];
+            const correctIndex = currentSceneData.correctIndex;
+            
+            // Подсвечиваем правильный ответ
+            const buttons = buttonsContainer.querySelectorAll('.slide-button');
+            buttons[correctIndex].style.background = 'linear-gradient(45deg, #00FF00, #00CC00)';
+            buttons[correctIndex].style.boxShadow = '0 0 20px #00FF00';
+            
+            showAlert('💡 ПОДСКАЗКА АКТИВИРОВАНА!', 2000);
+            
+            // Через 5 секунд убираем подсветку
+            setTimeout(() => {
+                if (!isGameOver) {
+                    buttons[correctIndex].style.background = '';
+                    buttons[correctIndex].style.boxShadow = '';
+                }
+            }, 5000);
+        }
+        
+        // СПОСОБНОСТЬ: ЗАМЕДЛЕНИЕ ВРЕМЕНИ
+        function useSlowPower() {
+            isChaosPaused = true;
+            slowTimeTimer = 20; // 20 секунд
+            
+            showAlert('⏳ ВРЕМЯ ЗАМЕДЛЕНО НА 20 СЕКУНД!', 2000);
+            
+            // Визуальный эффект замедления
+            gameScene.style.animationDuration = '2s';
+            
+            // Таймер для возобновления хаоса
+            const slowInterval = setInterval(() => {
+                slowTimeTimer--;
+                
+                if (slowTimeTimer <= 0 || isGameOver) {
+                    isChaosPaused = false;
+                    gameScene.style.animationDuration = '0.4s';
+                    clearInterval(slowInterval);
+                }
+            }, 1000);
+        }
+        
+        // СПОСОБНОСТЬ: ЩИТ
+        function useShieldPower() {
+            isShieldActive = true;
+            shieldTimer = 15; // 15 секунд
+            
+            showAlert('🛡️ ЩИТ АКТИВИРОВАН НА 15 СЕКУНД!', 2000);
+            
+            // Визуальный эффект щита
+            gameScene.style.borderColor = '#00FF00';
+            gameScene.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5)';
+            
+            // Таймер для отключения щита
+            const shieldInterval = setInterval(() => {
+                shieldTimer--;
+                
+                if (shieldTimer <= 0 || isGameOver) {
+                    isShieldActive = false;
+                    gameScene.style.borderColor = '#FF5D2E';
+                    gameScene.style.boxShadow = '0 0 20px rgba(255, 93, 46, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.5)';
+                    clearInterval(shieldInterval);
+                }
+            }, 1000);
+        }
+
+        // УЛУЧШЕННАЯ СИСТЕМА ХАОСА
+        function updateChaos(increase = true, amount = null) {
+            if (isShieldActive && increase) return;
+            
+            const baseAmount = amount || (10 - difficultyLevel);
+            
+            if (increase) {
+                chaosLevel += baseAmount;
+                if (chaosLevel > 100) {
+                    chaosLevel = 100;
+                    if (!isGameOver) endGame(false);
+                }
+            } else {
+                chaosLevel -= baseAmount;
+                if (chaosLevel < 0) chaosLevel = 0;
+            }
+            
+            chaosValue.textContent = chaosLevel + '%';
+            
+            // Динамическая сложность
+            updateDifficulty();
+            
+            // Визуальные эффекты
+            updateVisualEffects();
+        }
+
+        function updateDifficulty() {
+            const newDifficulty = Math.floor(chaosLevel / 20) + 1;
+            if (newDifficulty !== difficultyLevel) {
+                difficultyLevel = newDifficulty;
+                difficultyLevelElement.textContent = difficultyLevel;
+                showAlert(`📈 СЛОЖНОСТЬ УВЕЛИЧЕНА ДО ${difficultyLevel} УРОВНЯ!`, 2000);
+            }
+        }
+
+        function updateVisualEffects() {
+            // Обновляем визуальные эффекты хаоса
+            updateChaosVisual();
+            
+            // Включаем/выключаем тряску сцены
+            if (chaosLevel > 50 && !gameScene.classList.contains('scene-shake')) {
+                gameScene.classList.add('scene-shake');
+            } else if (chaosLevel <= 50 && gameScene.classList.contains('scene-shake')) {
+                gameScene.classList.remove('scene-shake');
+            }
+            
+            // Изменяем интенсивность тряски в зависимости от уровня хаоса
+            if (chaosLevel > 50) {
+                const shakeIntensity = 0.4 - (chaosLevel / 250);
+                gameScene.style.animationDuration = `${shakeIntensity}s`;
+            }
+        }
+
+        function updateChaosVisual() {
+            chaosVisual.innerHTML = '';
+            const elementCount = Math.floor(chaosLevel / 10);
+            
+            for (let i = 0; i < elementCount; i++) {
+                const element = document.createElement('div');
+                element.className = 'chaos-element';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.top = Math.random() * 100 + '%';
+                element.style.width = Math.random() * 50 + 30 + 'px';
+                element.style.height = Math.random() * 50 + 30 + 'px';
+                element.style.background = `radial-gradient(circle, 
+                    rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7), 
+                    transparent)`;
+                element.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                element.style.animationDelay = Math.random() * 3 + 's';
+                chaosVisual.appendChild(element);
+            }
+        }
+
+        // УЛУЧШЕННАЯ СИСТЕМА КОМБО
+        function updateCombo(isCorrect) {
+            if (isCorrect) {
+                comboCount++;
+                
+                // Увеличиваем множитель каждые 2 правильных ответа
+                if (comboCount >= 2) {
+                    comboMultiplier = Math.floor(comboCount / 2) + 1;
+                    if (comboMultiplier > 5) comboMultiplier = 5;
+                    
+                    // Показываем комбо-анимацию
+                    showComboAnimation();
+                }
+            } else {
+                // Сбрасываем комбо при ошибке
+                comboCount = 0;
+                comboMultiplier = 1;
+            }
+            
+            // Обновляем отображение комбо
+            comboValue.textContent = comboMultiplier;
+            
+            if (comboCount >= 2) {
+                comboDisplay.style.display = 'block';
+                comboDisplay.classList.add('combo-animation');
+            } else {
+                comboDisplay.style.display = 'none';
+                comboDisplay.classList.remove('combo-animation');
+            }
+        }
+        
+        function showComboAnimation() {
+            // Создаем эффектные частицы для комбо
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.background = '#FFD700';
+                    particle.style.width = '8px';
+                    particle.style.height = '8px';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    document.getElementById('game-container').appendChild(particle);
+                    setTimeout(() => particle.remove(), 2000);
+                }, i * 50);
+            }
+            
+            // Мигающий текст комбо
+            let blinkCount = 0;
+            const blinkInterval = setInterval(() => {
+                comboDisplay.style.visibility = comboDisplay.style.visibility === 'hidden' ? 'visible' : 'hidden';
+                blinkCount++;
+                
+                if (blinkCount >= 6) {
+                    clearInterval(blinkInterval);
+                    comboDisplay.style.visibility = 'visible';
+                }
+            }, 200);
+        }
+
+        // УЛУЧШЕННАЯ ЗАГРУЗКА СЦЕН
+        function loadScene(sceneIndex) {
+            if (sceneIndex >= scenes.length) {
+                endGame(true);
+                return;
+            }
+            
+            const scene = scenes[sceneIndex];
+            sceneTitle.textContent = scene.title;
+            sceneDescription.textContent = scene.description;
+            buttonsContainer.innerHTML = '';
+            
+            scene.choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'slide-button';
+                button.textContent = choice;
+                button.onclick = () => makeChoice(index, scene);
+                buttonsContainer.appendChild(button);
+            });
+            
+            // Обновляем прогресс
+            currentScene = sceneIndex + 1;
+            sceneNumber.textContent = currentScene;
+            sceneProgress.style.width = `${(currentScene / scenes.length) * 100}%`;
+            
+            // Увеличиваем хаос при загрузке новой сцены
+            updateChaos(true, scene.chaosIncrease);
+            
+            // Создаем частицы для визуального эффекта
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createParticles, i * 200);
+            }
+        }
+        
+        function createParticles() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            document.getElementById('game-container').appendChild(particle);
+            setTimeout(() => particle.remove(), 2000);
+        }
+
+        function showAlert(message, duration = 1500) {
+            alertElement.textContent = message;
+            alertElement.classList.remove('alert-success');
+            
+            if (message.includes('ПОДСКАЗКА') || message.includes('УСПЕХ') || message.includes('ПОБЕДА')) {
+                alertElement.classList.add('alert-success');
+            }
+            
+            setTimeout(() => {
+                if (!isGameOver) {
+                    alertElement.textContent = '⚠️ ВЫБИРАЙТЕ МУДРО! ⚠️';
+                    alertElement.classList.remove('alert-success');
+                }
+            }, duration);
+        }
+        
+        function showFeedback(message, isCorrect) {
+            const feedback = document.createElement('div');
+            feedback.className = `choice-feedback ${isCorrect ? 'correct-feedback' : 'wrong-feedback'}`;
+            feedback.textContent = message;
+            document.getElementById('scene-content').appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.remove();
+            }, 1500);
+        }
+
+        function makeChoice(choiceIndex, scene) {
+            if (isGameOver || isPaused) return;
+            
+            const isCorrect = choiceIndex === scene.correctIndex;
+            
+            // Обновляем комбо
+            updateCombo(isCorrect);
+            
+            // Показать сообщение выбора
+            showAlert('⚠️ ' + scene.messages[choiceIndex] + ' ⚠️');
+            
+            // Показать визуальную обратную связь
+            showFeedback(isCorrect ? '✓ ПРАВИЛЬНО!' : '✗ ОШИБКА!', isCorrect);
+            
+            // Виброотклик (если поддерживается)
+            if (navigator.vibrate) {
+                navigator.vibrate(isCorrect ? [50, 50, 50] : [200]);
+            }
+            
+            if (isCorrect) {
+                // Начисляем очки с учетом комбо-множителя и уровня хаоса
+                const basePoints = 100;
+                const chaosBonus = Math.floor(chaosLevel * 2);
+                const comboBonus = comboMultiplier > 1 ? (basePoints * (comboMultiplier - 1)) : 0;
+                const pointsEarned = basePoints + chaosBonus + comboBonus;
+                
+                score += pointsEarned;
+                scoreValue.textContent = score;
+                
+                // Уменьшаем хаос при правильном ответе
+                updateChaos(false, 15);
+                
+                // Переходим к следующей сцене
+                setTimeout(() => loadScene(currentScene), 1500);
+                
+                // ЭФФЕКТ УСПЕХА
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(createParticles, i * 50);
+                }
+                
+                // Восстанавливаем способности с шансом
+                if (Math.random() > 0.7) {
+                    const randomPower = Object.keys(powers)[Math.floor(Math.random() * Object.keys(powers).length)];
+                    if (powers[randomPower].count < 3) {
+                        powers[randomPower].count++;
+                        updatePowerButtons();
+                        showAlert(`✨ ВОССТАНОВЛЕНА СПОСОБНОСТЬ: ${randomPower === 'hint' ? '💡 ПОДСКАЗКА' : randomPower === 'slow' ? '⏳ ЗАМЕДЛЕНИЕ' : '🛡️ ЩИТ'}!`, 2000);
+                    }
+                }
+            } else {
+                // Штраф за ошибку
+                score = Math.max(0, score - 50);
+                scoreValue.textContent = score;
+                
+                // Визуальный эффект ошибки
+                gameScene.classList.add('wrong-choice');
+                setTimeout(() => gameScene.classList.remove('wrong-choice'), 500);
+                
+                // Увеличиваем хаос при ошибке
+                updateChaos(true, scene.chaosIncrease);
+            }
+        }
+
+        function endGame(victory) {
+            isGameOver = true;
+            buttonsContainer.innerHTML = '';
+            
+            if (victory) {
+                sceneTitle.textContent = "🎆 ПОБЕДА НАД ХАОСОМ! 🎆";
+                sceneDescription.textContent = `Вы прошли через все испытания и вышли победителем из пучины энтропии! Ваши баллы: ${score}`;
+                showAlert(`⭐ ВЫ ПОКОРИЛИ ХАОС! БАЛЛЫ: ${score} ⭐`, 5000);
+            } else {
+                sceneTitle.textContent = "💀 ХАОС ПОБЕДИЛ 💀";
+                sceneDescription.textContent = `Энтропия поглотила вас. Реальность распалась на частицы. Ваши баллы: ${score}`;
+                showAlert(`☠️ ВЫ ПОГЛОЩЕНЫ ЭНТРОПИЕЙ! БАЛЛЫ: ${score} ☠️`, 5000);
+            }
+            
+            const restartButton = document.createElement('button');
+            restartButton.className = 'slide-button';
+            restartButton.textContent = '🔄 НАЧАТЬ ЗАНОВО';
+            restartButton.onclick = () => location.reload();
+            buttonsContainer.appendChild(restartButton);
+        }
+
+        // УЛУЧШЕННЫЙ ИГРОВОЙ ЦИКЛ
+        function startGameLoop() {
+            setInterval(() => {
+                if (!isGameOver && !isPaused && !isChaosPaused) {
+                    timeElapsed++;
+                    timeValue.textContent = timeElapsed;
+                    
+                    // Динамическое увеличение хаоса
+                    if (timeElapsed % (20 - difficultyLevel * 2) === 0) {
+                        updateChaos(true, 2);
+                    }
+                    
+                    // Создание частиц каждые 3 секунды
+                    if (timeElapsed % 3 === 0) {
+                        createParticles();
+                    }
+                }
+            }, 1000);
+        }
+
+        // ЗАПУСК ИГРЫ
+        initializeGame();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ХРОНИКИ ХАОСА</title>
     <style>
         * {
