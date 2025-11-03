@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ХРОНИКИ ТРАГЕДИИ СЛАЙДОВ</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(45deg, #000000, #1a0033, #330033, #000000);
+    background-size: 400% 400%;
+    animation: chaosGradient 5s ease infinite;
+    color: #FFFFFF;
+    overflow: hidden;
+    height: 100vh;
+  }
+  
+  @keyframes chaosGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  #game-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  #chaos-meter {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #FF0000;
+    text-shadow: 0 0 10px #FF0000, 0 0 20px #FF0000;
+    animation: pulse 0.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+  
+  #timer {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 48px;
+    font-weight: bold;
+    color: #00FF00;
+    text-shadow: 0 0 20px #00FF00;
+  }
+  
+  #game-scene {
+    width: 80%;
+    max-width: 800px;
+    height: 500px;
+    background: rgba(247, 215, 212, 0.1);
+    border: 3px solid #FF5D2E;
+    box-shadow: 0 0 30px rgba(255, 93, 46, 0.8), inset 0 0 50px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: sceneShake 0.3s infinite;
+  }
+  
+  @keyframes sceneShake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-2px, 2px) rotate(-0.5deg); }
+    50% { transform: translate(2px, -2px) rotate(0.5deg); }
+    75% { transform: translate(-2px, -2px) rotate(-0.5deg); }
+  }
+  
+  #scene-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  #scene-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 0 20px #FFD700, 0 0 40px #FF5D2E;
+    margin-bottom: 30px;
+    animation: titleGlitch 1s infinite;
+  }
+  
+  @keyframes titleGlitch {
+    0%, 90%, 100% { transform: translate(0, 0); }
+    92% { transform: translate(-5px, 2px); }
+    94% { transform: translate(5px, -2px); }
+    96% { transform: translate(-3px, -3px); }
+  }
+  
+  .slide-button {
+    margin: 15px;
+    padding: 20px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FF0000, #FF5D2E, #FFD700);
+    background-size: 200% 200%;
+    border: 3px solid #FFFFFF;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-shadow: 0 0 5px #FFFFFF;
+    animation: buttonPulse 2s infinite;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  @keyframes buttonPulse {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  .slide-button:hover {
+    transform: scale(1.2) rotate(3deg);
+    box-shadow: 0 0 40px #FF5D2E;
+  }
+  
+  .slide-button:active {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  
+  #alert-element {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    font-weight: bold;
+    color: #FF0000;
+    text-shadow: 0 0 10px #FF0000, 0 0 20px #FFFFFF;
+    text-align: center;
+    animation: alertBlink 0.5s infinite;
+    padding: 15px 30px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #FF0000;
+    border-radius: 10px;
+  }
+  
+  @keyframes alertBlink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0.3; }
+  }
+  
+  .particle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #FFD700;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFloat 2s infinite;
+  }
+  
+  @keyframes particleFloat {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-500px) scale(0); opacity: 0; }
+  }
+  
+  #score-display {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 32px;
+    color: #00FFFF;
+    text-shadow: 0 0 10px #00FFFF;
+  }
+  
+  .wrong-choice {
+    animation: wrongShake 0.5s;
+  }
+  
+  @keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="timer">⏱️ <span id="time-value">0</span>с</div>
+  <div id="chaos-meter">🔥 ХАОС: <span id="chaos-value">0</span>%</div>
+  <div id="score-display">💀 БАЛЛЫ: <span id="score-value">0</span></div>
+  
+  <div id="game-scene">
+    <div id="scene-content">
+      <div id="scene-title">НАЧАЛО КОНЦА</div>
+      <div id="buttons-container"></div>
+    </div>
+  </div>
+  
+  <div id="alert-element">⚠️ НАЧИНАЕТСЯ ХАОС! ⚠️</div>
+</div>
+
+<script>
+  // ПЕРЕМЕННЫЕ ХАОСА
+  let currentScene = 1;
+  let chaosLevel = 0;
+  let score = 0;
+  let timeElapsed = 0;
+  let isGameOver = false;
+  
+  // СЦЕНЫ ТРАГЕДИИ
+  const scenes = [
+    {
+      title: "НАЧАЛО КОНЦА",
+      choices: ["🚪 Войти в портал", "🏃 Убежать от судьбы", "💀 Принять хаос"],
+      correctIndex: 2,
+      messages: ["Трусость не спасёт!", "Судьба настигнет!", "ВЫ ПРИНЯЛИ ХАОС!"]
+    },
+    {
+      title: "БЕЗДНА ВОПИТ",
+      choices: ["👁️ Смотреть в бездну", "🔥 Сжечь реальность", "❄️ Заморозить время"],
+      correctIndex: 0,
+      messages: ["Реальность устояла!", "Время не подвластно!", "БЕЗДНА СМОТРИТ НАЗАД!"]
+    },
+    {
+      title: "ТАНЕЦ ЭНТРОПИИ",
+      choices: ["💃 Танцевать с хаосом", "⚡ Стать молнией", "🌊 Утонуть в волнах"],
+      correctIndex: 0,
+      messages: ["Молния ударила в вас!", "Волны поглотили!", "ВЫ СТАЛИ ХАОСОМ!"]
+    },
+    {
+      title: "ЭХО РАЗРУШЕНИЯ",
+      choices: ["🎭 Снять маску", "🎪 Войти в цирк", "🎨 Нарисовать выход"],
+      correctIndex: 2,
+      messages: ["Лицо растворилось!", "Цирк не отпускает!", "ВЫХОД СОЗДАН!"]
+    },
+    {
+      title: "ФИНАЛЬНЫЙ КОЛЛАПС",
+      choices: ["⭐ Стать звездой", "🌑 Погаснуть навсегда", "♾️ Войти в петлю"],
+      correctIndex: 0,
+      messages: ["Тьма поглотила!", "Петля бесконечна!", "ВЫ ВЗОРВАЛИСЬ КАК СВЕРХНОВАЯ!"]
+    }
+  ];
+  
+  // ЭЛЕМЕНТЫ
+  const sceneTitle = document.getElementById('scene-title');
+  const buttonsContainer = document.getElementById('buttons-container');
+  const alertElement = document.getElementById('alert-element');
+  const chaosValue = document.getElementById('chaos-value');
+  const scoreValue = document.getElementById('score-value');
+  const timeValue = document.getElementById('time-value');
+  const gameScene = document.getElementById('game-scene');
+  
+  // ФУНКЦИИ ХАОСА
+  function createParticles() {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 2 + 's';
+    document.getElementById('game-container').appendChild(particle);
+    setTimeout(() => particle.remove(), 2000);
+  }
+  
+  function updateChaos(increase = true) {
+    if (increase) {
+      chaosLevel += 20;
+      if (chaosLevel > 100) chaosLevel = 100;
+    }
+    chaosValue.textContent = chaosLevel;
+    
+    // ВИЗУАЛЬНЫЙ ХАОС
+    if (chaosLevel > 50) {
+      gameScene.style.animation = `sceneShake ${0.5 - (chaosLevel / 200)}s infinite`;
+    }
+  }
+  
+  function loadScene(sceneIndex) {
+    if (sceneIndex >= scenes.length) {
+      endGame(true);
+      return;
+    }
+    
+    const scene = scenes[sceneIndex];
+    sceneTitle.textContent = scene.title;
+    buttonsContainer.innerHTML = '';
+    
+    scene.choices.forEach((choice, index) => {
+      const button = document.createElement('button');
+      button.className = 'slide-button';
+      button.textContent = choice;
+      button.onclick = () => makeChoice(index, scene);
+      buttonsContainer.appendChild(button);
+    });
+    
+    updateChaos(true);
+    for (let i = 0; i < 5; i++) {
+      setTimeout(createParticles, i * 200);
+    }
+  }
+  
+  function makeChoice(choiceIndex, scene) {
+    if (isGameOver) return;
+    
+    const isCorrect = choiceIndex === scene.correctIndex;
+    alertElement.textContent = '⚠️ ' + scene.messages[choiceIndex] + ' ⚠️';
+    
+    if (isCorrect) {
+      score += 100 + (chaosLevel * 2);
+      scoreValue.textContent = score;
+      currentScene++;
+      setTimeout(() => loadScene(currentScene - 1), 1500);
+      
+      // ЭФФЕКТ УСПЕХА
+      for (let i = 0; i < 20; i++) {
+        setTimeout(createParticles, i * 50);
+      }
+    } else {
+      score -= 50;
+      if (score < 0) score = 0;
+      scoreValue.textContent = score;
+      gameScene.classList.add('wrong-choice');
+      setTimeout(() => gameScene.classList.remove('wrong-choice'), 500);
+      
+      chaosLevel += 30;
+      if (chaosLevel > 100) {
+        endGame(false);
+      }
+    }
+  }
+  
+  function endGame(victory) {
+    isGameOver = true;
+    buttonsContainer.innerHTML = '';
+    
+    if (victory) {
+      sceneTitle.textContent = "🎆 ПОБЕДА! 🎆";
+      alertElement.textContent = `⭐ ВЫ ПОКОРИЛИ ХАОС! БАЛЛЫ: ${score} ⭐`;
+    } else {
+      sceneTitle.textContent = "💀 ХАОС ПОБЕДИЛ 💀";
+      alertElement.textContent = `☠️ ВЫ ПОГЛОЩЕНЫ ЭНТРОПИЕЙ! БАЛЛЫ: ${score} ☠️`;
+    }
+    
+    const restartButton = document.createElement('button');
+    restartButton.className = 'slide-button';
+    restartButton.textContent = '🔄 НАЧАТЬ ЗАНОВО';
+    restartButton.onclick = () => location.reload();
+    buttonsContainer.appendChild(restartButton);
+  }
+  
+  // ТАЙМЕР ХАОСА
+  setInterval(() => {
+    if (!isGameOver) {
+      timeElapsed++;
+      timeValue.textContent = timeElapsed;
+      
+      if (timeElapsed % 3 === 0) {
+        createParticles();
+      }
+      
+      if (timeElapsed % 10 === 0) {
+        updateChaos(true);
+      }
+    }
+  }, 1000);
+  
+  // БЕСКОНЕЧНЫЕ ЧАСТИЦЫ
+  setInterval(() => {
+    if (!isGameOver) {
+      createParticles();
+    }
+  }, 500);
+  
+  // СТАРТ ИГРЫ!
+  loadScene(0);
+  alertElement.textContent = '⚠️ НАЧИНАЕТСЯ ХАОС! ВЫБИРАЙТЕ МУДРО! ⚠️';
+</script>
+</body>
+</html>
