@@ -316,6 +316,83 @@
     50% { opacity: 0.2; transform: scale(1) rotate(180deg); }
   }
   
+  /* Стили для системы комбо */
+  #combo-display {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 0 10px #FFD700, 0 0 20px #FF5D2E;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 2px solid #FFD700;
+    z-index: 10;
+    display: none;
+  }
+  
+  .combo-animation {
+    animation: comboPulse 0.5s infinite;
+  }
+  
+  @keyframes comboPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.2); }
+  }
+  
+  /* Стили для супер-способностей */
+  #powers-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+  }
+  
+  .power-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.7);
+    transition: all 0.3s;
+  }
+  
+  .power-button:active {
+    transform: scale(0.9);
+  }
+  
+  .power-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .power-count {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #FF0000;
+    color: #FFFFFF;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
   /* Адаптация для очень маленьких экранов */
   @media (max-height: 700px) {
     #game-scene {
@@ -393,6 +470,12 @@
       bottom: 5px;
       font-size: 16px;
     }
+    
+    #powers-container {
+      flex-direction: row;
+      bottom: 5px;
+      left: 5px;
+    }
   }
 </style>
 </head>
@@ -404,6 +487,8 @@
     <div id="score-display">💀 <span id="score-value">0</span></div>
   </div>
   
+  <div id="combo-display">КОМБО: x<span id="combo-value">1</span></div>
+  
   <div id="game-scene">
     <div id="scene-content">
       <div id="scene-title">НАЧАЛО КОНЦА</div>
@@ -413,6 +498,21 @@
   </div>
   
   <div id="alert-element">⚠️ НАЧИНАЕТСЯ ХАОС! ⚠️</div>
+  
+  <div id="powers-container">
+    <div class="power-button" id="hint-power" data-power="hint">
+      💡
+      <div class="power-count" id="hint-count">2</div>
+    </div>
+    <div class="power-button" id="slow-power" data-power="slow">
+      ⏳
+      <div class="power-count" id="slow-count">2</div>
+    </div>
+    <div class="power-button" id="shield-power" data-power="shield">
+      🛡️
+      <div class="power-count" id="shield-count">1</div>
+    </div>
+  </div>
   
   <div id="achievements">
     <div class="achievement locked">🔒 Первый шаг</div>
@@ -436,42 +536,102 @@
     entropyWinner: false
   };
   
-  // СЦЕНЫ ТРАГЕДИИ
+  // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ СИСТЕМЫ КОМБО И СПОСОБНОСТЕЙ
+  let comboCount = 0;
+  let comboMultiplier = 1;
+  let isChaosPaused = false;
+  let isShieldActive = false;
+  let shieldTimer = 0;
+  let slowTimeTimer = 0;
+  
+  // СЧЁТЧИКИ СПОСОБНОСТЕЙ
+  let powers = {
+    hint: { count: 2, element: null },
+    slow: { count: 2, element: null },
+    shield: { count: 1, element: null }
+  };
+  
+  // СЦЕНЫ ТРАГЕДИИ (УВЕЛИЧЕННО ДО 10 СЦЕН)
   const scenes = [
     {
-      title: "НАЧАЛО КОНЦА",
+      id: 1,
+      title: "🌀 НАЧАЛО КОНЦА",
       description: "Вы стоите на пороге реальности, чувствуя, как ткань бытия начинает распадаться. Время и пространство искажаются вокруг вас.",
       choices: ["🚪 Войти в портал", "🏃 Убежать от судьбы", "💀 Принять хаос"],
       correctIndex: 2,
       messages: ["Трусость не спасёт!", "Судьба настигнет!", "ВЫ ПРИНЯЛИ ХАОС!"]
     },
     {
-      title: "БЕЗДНА ВОПИТ",
+      id: 2,
+      title: "👁️ БЕЗДНА ВОПИТ",
       description: "Перед вами разверзлась бездна, наполненная шепотом забытых миров. Её голос проникает в самое сознание.",
       choices: ["👁️ Смотреть в бездну", "🔥 Сжечь реальность", "❄️ Заморозить время"],
       correctIndex: 0,
       messages: ["Реальность устояла!", "Время не подвластно!", "БЕЗДНА СМОТРИТ НАЗАД!"]
     },
     {
-      title: "ТАНЕЦ ЭНТРОПИИ",
+      id: 3,
+      title: "💃 ТАНЕЦ ЭНТРОПИИ",
       description: "Вселенная танцует свой последний танец. Частицы материи распадаются в ритме вселенской симфонии разрушения.",
       choices: ["💃 Танцевать с хаосом", "⚡ Стать молнией", "🌊 Утонуть в волнах"],
       correctIndex: 0,
       messages: ["Молния ударила в вас!", "Волны поглотили!", "ВЫ СТАЛИ ХАОСОМ!"]
     },
     {
-      title: "ЭХО РАЗРУШЕНИЯ",
+      id: 4,
+      title: "🎭 ЭХО РАЗРУШЕНИЯ",
       description: "Отголоски ваших решений разносятся по рушащейся реальности. Каждое действие создает новые миры и уничтожает старые.",
       choices: ["🎭 Снять маску", "🎪 Войти в цирк", "🎨 Нарисовать выход"],
       correctIndex: 2,
       messages: ["Лицо растворилось!", "Цирк не отпускает!", "ВЫХОД СОЗДАН!"]
     },
     {
-      title: "ФИНАЛЬНЫЙ КОЛЛАПС",
-      description: "Реальность сжимается в точку. Последние моменты существования подходят к концу. Что выберете в финале?",
-      choices: ["⭐ Стать звездой", "🌑 Погаснуть навсегда", "♾️ Войти в петлю"],
+      id: 5,
+      title: "🌑 ЗАТМЕНИЕ РАЗУМА",
+      description: "Ваш разум окутывает тьма. Тени прошлого и будущего сливаются в единый кошмар настоящего.",
+      choices: ["🕯️ Зажечь свечу", "🌅 Встретить рассвет", "🌌 Погрузиться во тьму"],
+      correctIndex: 1,
+      messages: ["Свеча погасла!", "Тьма поглотила!", "РАССВЕТ ПРОГНАЛ ТЕНИ!"]
+    },
+    {
+      id: 6,
+      title: "⚡ БУРЯ ИЗМЕНЕНИЙ",
+      description: "Реальность разрывается штормом перемен. Каждая молния рождает новую вселенную и уничтожает старую.",
+      choices: ["⚡ Ловить молнии", "🌀 Войти в эпицентр", "🛡️ Укрыться от бури"],
+      correctIndex: 1,
+      messages: ["Молнии сожгли!", "Укрытие рухнуло!", "ВЫ СТАЛИ ЦЕНТРОМ БУРИ!"]
+    },
+    {
+      id: 7,
+      title: "🔮 КРИСТАЛЛ СУДЕБ",
+      description: "Перед вами парит кристалл, в гранях которого отражаются все возможные реальности и судьбы.",
+      choices: ["🔮 Заглянуть в кристалл", "💎 Разбить иллюзии", "🌈 Поймать отражение"],
       correctIndex: 0,
-      messages: ["Тьма поглотила!", "Петля бесконечна!", "ВЫ ВЗОРВАЛИСЬ КАК СВЕРХНОВАЯ!"]
+      messages: ["Иллюзии разбились!", "Отражение ускользнуло!", "ВЫ УВИДЕЛИ ВСЕ СУДЬБЫ!"]
+    },
+    {
+      id: 8,
+      title: "🌋 ИЗВЕРЖЕНИЕ ХАОСА",
+      description: "Хаос извергается из недр реальности, угрожая поглотить последние островки порядка.",
+      choices: ["🌋 Броситься в жерло", "🏔️ Взобраться на пик", "🌊 Переплыть лаву"],
+      correctIndex: 1,
+      messages: ["Жерло поглотило!", "Лава сожгла!", "ВЫ ПОДНЯЛИСЬ НАД ХАОСОМ!"]
+    },
+    {
+      id: 9,
+      title: "⭐ РОЖДЕНИЕ СВЕРХНОВОЙ",
+      description: "Вы стоите в эпицентре космического взрыва, где рождаются и умирают звёзды.",
+      choices: ["⭐ Стать сверхновой", "🌠 Испустить свет", "💥 Взорваться вместе"],
+      correctIndex: 0,
+      messages: ["Свет погас!", "Взрыв поглотил!", "ВЫ СТАЛИ СВЕРХНОВОЙ!"]
+    },
+    {
+      id: 10,
+      title: "♾️ БЕСКОНЕЧНАЯ ПЕТЛЯ",
+      description: "Реальность замыкается в петлю. Каждое решение ведёт к началу, но с новыми последствиями.",
+      choices: ["♾️ Войти в петлю", "⏩ Ускорить время", "⏹️ Остановить всё"],
+      correctIndex: 2,
+      messages: ["Петля затянула!", "Время ускорилось!", "ВЫ ОСТАНОВИЛИ БЕСКОНЕЧНОСТЬ!"]
     }
   ];
   
@@ -486,6 +646,130 @@
   const gameScene = document.getElementById('game-scene');
   const chaosVisual = document.getElementById('chaos-visual');
   const achievementElements = document.querySelectorAll('.achievement');
+  const comboDisplay = document.getElementById('combo-display');
+  const comboValue = document.getElementById('combo-value');
+  
+  // ИНИЦИАЛИЗАЦИЯ СПОСОБНОСТЕЙ
+  function initializePowers() {
+    powers.hint.element = document.getElementById('hint-power');
+    powers.slow.element = document.getElementById('slow-power');
+    powers.shield.element = document.getElementById('shield-power');
+    
+    // Добавляем обработчики событий для способностей
+    powers.hint.element.addEventListener('click', () => usePower('hint'));
+    powers.slow.element.addEventListener('click', () => usePower('slow'));
+    powers.shield.element.addEventListener('click', () => usePower('shield'));
+    
+    updatePowerButtons();
+  }
+  
+  // ОБНОВЛЕНИЕ КНОПОК СПОСОБНОСТЕЙ
+  function updatePowerButtons() {
+    for (const power in powers) {
+      const element = powers[power].element;
+      const countElement = element.querySelector('.power-count');
+      
+      countElement.textContent = powers[power].count;
+      
+      if (powers[power].count === 0) {
+        element.classList.add('disabled');
+      } else {
+        element.classList.remove('disabled');
+      }
+    }
+  }
+  
+  // ИСПОЛЬЗОВАНИЕ СПОСОБНОСТИ
+  function usePower(powerType) {
+    if (powers[powerType].count <= 0 || isGameOver) return;
+    
+    powers[powerType].count--;
+    updatePowerButtons();
+    
+    switch(powerType) {
+      case 'hint':
+        useHintPower();
+        break;
+      case 'slow':
+        useSlowPower();
+        break;
+      case 'shield':
+        useShieldPower();
+        break;
+    }
+    
+    // Виброотклик (если поддерживается)
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+  }
+  
+  // СПОСОБНОСТЬ: ПОДСКАЗКА
+  function useHintPower() {
+    const currentSceneData = scenes[currentScene - 1];
+    const correctIndex = currentSceneData.correctIndex;
+    
+    // Подсвечиваем правильный ответ
+    const buttons = buttonsContainer.querySelectorAll('.slide-button');
+    buttons[correctIndex].style.background = 'linear-gradient(45deg, #00FF00, #00CC00)';
+    buttons[correctIndex].style.boxShadow = '0 0 20px #00FF00';
+    
+    showAlert('💡 ПОДСКАЗКА АКТИВИРОВАНА!', 2000);
+    
+    // Через 5 секунд убираем подсветку
+    setTimeout(() => {
+      if (!isGameOver) {
+        buttons[correctIndex].style.background = '';
+        buttons[correctIndex].style.boxShadow = '';
+      }
+    }, 5000);
+  }
+  
+  // СПОСОБНОСТЬ: ЗАМЕДЛЕНИЕ ВРЕМЕНИ
+  function useSlowPower() {
+    isChaosPaused = true;
+    slowTimeTimer = 20; // 20 секунд
+    
+    showAlert('⏳ ВРЕМЯ ЗАМЕДЛЕНО НА 20 СЕКУНД!', 2000);
+    
+    // Визуальный эффект замедления
+    gameScene.style.animationDuration = '2s';
+    
+    // Таймер для возобновления хаоса
+    const slowInterval = setInterval(() => {
+      slowTimeTimer--;
+      
+      if (slowTimeTimer <= 0 || isGameOver) {
+        isChaosPaused = false;
+        gameScene.style.animationDuration = '0.3s';
+        clearInterval(slowInterval);
+      }
+    }, 1000);
+  }
+  
+  // СПОСОБНОСТЬ: ЩИТ
+  function useShieldPower() {
+    isShieldActive = true;
+    shieldTimer = 15; // 15 секунд
+    
+    showAlert('🛡️ ЩИТ АКТИВИРОВАН НА 15 СЕКУНД!', 2000);
+    
+    // Визуальный эффект щита
+    gameScene.style.borderColor = '#00FF00';
+    gameScene.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5)';
+    
+    // Таймер для отключения щита
+    const shieldInterval = setInterval(() => {
+      shieldTimer--;
+      
+      if (shieldTimer <= 0 || isGameOver) {
+        isShieldActive = false;
+        gameScene.style.borderColor = '#FF5D2E';
+        gameScene.style.boxShadow = '0 0 20px rgba(255, 93, 46, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5)';
+        clearInterval(shieldInterval);
+      }
+    }, 1000);
+  }
   
   // ФУНКЦИИ ХАОСА
   function createParticles() {
@@ -518,10 +802,19 @@
   }
   
   function updateChaos(increase = true) {
-    if (increase) {
-      chaosLevel += 20;
-      if (chaosLevel > 100) chaosLevel = 100;
+    // Если щит активен, не увеличиваем хаос
+    if (increase && isShieldActive) {
+      return;
     }
+    
+    if (increase) {
+      chaosLevel += 10; // Уменьшил с 20 до 10 для баланса
+      if (chaosLevel > 100) chaosLevel = 100;
+    } else {
+      chaosLevel -= 10; // Уменьшаем хаос при правильном ответе
+      if (chaosLevel < 0) chaosLevel = 0;
+    }
+    
     chaosValue.textContent = chaosLevel;
     
     // ВИЗУАЛЬНЫЙ ХАОС
@@ -539,6 +832,66 @@
       achievementElements[1].textContent = '✅ Мастер хаоса';
       showAlert('ДОСТИЖЕНИЕ: Мастер хаоса!', 3000);
     }
+  }
+  
+  // СИСТЕМА КОМБО
+  function updateCombo(isCorrect) {
+    if (isCorrect) {
+      comboCount++;
+      
+      // Увеличиваем множитель каждые 3 правильных ответа
+      if (comboCount >= 3) {
+        comboMultiplier = Math.floor(comboCount / 3) + 1;
+        if (comboMultiplier > 5) comboMultiplier = 5;
+        
+        // Показываем комбо-анимацию
+        showComboAnimation();
+      }
+    } else {
+      // Сбрасываем комбо при ошибке
+      comboCount = 0;
+      comboMultiplier = 1;
+    }
+    
+    // Обновляем отображение комбо
+    comboValue.textContent = comboMultiplier;
+    
+    if (comboCount >= 3) {
+      comboDisplay.style.display = 'block';
+      comboDisplay.classList.add('combo-animation');
+    } else {
+      comboDisplay.style.display = 'none';
+      comboDisplay.classList.remove('combo-animation');
+    }
+  }
+  
+  function showComboAnimation() {
+    // Создаем эффектные частицы для комбо
+    for (let i = 0; i < 30; i++) {
+      setTimeout(() => {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.background = '#FFD700';
+        particle.style.width = '8px';
+        particle.style.height = '8px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        document.getElementById('game-container').appendChild(particle);
+        setTimeout(() => particle.remove(), 2000);
+      }, i * 50);
+    }
+    
+    // Мигающий текст комбо
+    let blinkCount = 0;
+    const blinkInterval = setInterval(() => {
+      comboDisplay.style.visibility = comboDisplay.style.visibility === 'hidden' ? 'visible' : 'hidden';
+      blinkCount++;
+      
+      if (blinkCount >= 6) {
+        clearInterval(blinkInterval);
+        comboDisplay.style.visibility = 'visible';
+      }
+    }, 200);
   }
   
   function loadScene(sceneIndex) {
@@ -568,7 +921,10 @@
       achievementElements[0].textContent = '✅ Первый шаг';
     }
     
+    // Увеличиваем хаос при загрузке новой сцены
     updateChaos(true);
+    
+    // Создаем частицы для визуального эффекта
     for (let i = 0; i < 5; i++) {
       setTimeout(createParticles, i * 200);
     }
@@ -599,15 +955,34 @@
     
     const isCorrect = choiceIndex === scene.correctIndex;
     
+    // Обновляем комбо
+    updateCombo(isCorrect);
+    
     // Показать сообщение выбора
     showAlert('⚠️ ' + scene.messages[choiceIndex] + ' ⚠️');
     
     // Показать визуальную обратную связь
     showFeedback(isCorrect ? '✓ ПРАВИЛЬНО!' : '✗ ОШИБКА!', isCorrect);
     
+    // Виброотклик (если поддерживается)
+    if (navigator.vibrate) {
+      navigator.vibrate(isCorrect ? [50, 50, 50] : [200]);
+    }
+    
     if (isCorrect) {
-      score += 100 + (chaosLevel * 2);
+      // Начисляем очки с учетом комбо-множителя и уровня хаоса
+      const basePoints = 100;
+      const chaosBonus = Math.floor(chaosLevel * 2);
+      const comboBonus = comboMultiplier > 1 ? (basePoints * (comboMultiplier - 1)) : 0;
+      const pointsEarned = basePoints + chaosBonus + comboBonus;
+      
+      score += pointsEarned;
       scoreValue.textContent = score;
+      
+      // Уменьшаем хаос при правильном ответе
+      updateChaos(false);
+      
+      // Переходим к следующей сцене
       currentScene++;
       setTimeout(() => loadScene(currentScene - 1), 1500);
       
@@ -616,14 +991,20 @@
         setTimeout(createParticles, i * 50);
       }
     } else {
+      // Штраф за ошибку
       score -= 50;
       if (score < 0) score = 0;
       scoreValue.textContent = score;
+      
+      // Визуальный эффект ошибки
       gameScene.classList.add('wrong-choice');
       setTimeout(() => gameScene.classList.remove('wrong-choice'), 500);
       
-      chaosLevel += 30;
-      if (chaosLevel > 100) {
+      // Увеличиваем хаос при ошибке
+      updateChaos(true);
+      
+      // Проверяем, не достиг ли хаос максимума
+      if (chaosLevel >= 100) {
         endGame(false);
       }
     }
@@ -660,16 +1041,18 @@
   
   // ТАЙМЕР ХАОСА
   setInterval(() => {
-    if (!isGameOver) {
+    if (!isGameOver && !isChaosPaused) {
       timeElapsed++;
       timeValue.textContent = timeElapsed;
       
-      if (timeElapsed % 3 === 0) {
-        createParticles();
+      // Каждые 15 секунд увеличиваем хаос
+      if (timeElapsed % 15 === 0) {
+        updateChaos(true);
       }
       
-      if (timeElapsed % 10 === 0) {
-        updateChaos(true);
+      // Каждые 3 секунды создаем частицы
+      if (timeElapsed % 3 === 0) {
+        createParticles();
       }
     }
   }, 1000);
@@ -682,6 +1065,7 @@
   }, 500);
   
   // СТАРТ ИГРЫ!
+  initializePowers();
   loadScene(0);
   showAlert('⚠️ НАЧИНАЕТСЯ ХАОС! ВЫБИРАЙТЕ МУДРО! ⚠️', 3000);
 </script>
