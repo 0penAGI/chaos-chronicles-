@@ -81,11 +81,15 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            /* Устанавливаем верхний отступ на 65px (10px по умолчанию + 55px смещения) 
-               и 10px для остальных сторон (или 0, если хочешь убрать боковые отступы) */
-            padding: 65px 10px 10px 10px; 
+            /* Добавляем 55px только сверху, остальные отступы 10px как было */
+            padding-top: 77px; 
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-bottom: 10px;
+            /* Или короче: padding: 65px 10px 10px 10px; */
             justify-content: space-between;
         }
+
 
         
         /* СЧЕТЧИК С ПУЛЬСАЦИЕЙ */
