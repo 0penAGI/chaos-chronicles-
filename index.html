@@ -63,7 +63,7 @@
         /* ВРЕМЕННЫЕ РЯБЬ */
         .time-ripple {
             position: fixed;
-            border: 1px solid rgba(0, 255, 255, 0.5);
+            border: 2px solid rgba(0, 255, 255, 0.5);
             border-radius: 50%;
             pointer-events: none;
             animation: rippleExpand 2s forwards;
@@ -95,10 +95,10 @@
         /* СЧЕТЧИК С ПУЛЬСАЦИЕЙ */
         #xsdc-counter {
             text-align: center;
-            padding: 22px;
+            padding: 15px;
             background: rgba(0, 0, 0, 0.9);
-            border-radius: 6px;
-            border: 1.68px solid #FFD700;
+            border-radius: 20px;
+            border: 4px solid #FFD700;
             box-shadow: 0 0 30px var(--glow-color, #FFD700);
             animation: counterPulse 1s infinite;
             position: relative;
@@ -113,7 +113,7 @@
             width: 200%;
             height: 200%;
             background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
-            animation: shine 3.14s infinite;
+            animation: shine 3s infinite;
         }
         
         @keyframes shine {
@@ -143,7 +143,7 @@
         }
         
         #xsdc-label {
-            font-size: 13px;
+            font-size: 18px;
             color: #FFF;
             margin-top: 5px;
             text-shadow: 0 0 10px #00FFFF;
@@ -156,16 +156,16 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
-            margin: 55px 0;
+            margin: 10px 0;
         }
         
         .stat {
             background: rgba(0, 0, 0, 0.85);
-            padding: 55px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 12px;
             border: 2px solid;
             text-align: center;
-            font-size: 8px;
+            font-size: 13px;
             font-weight: bold;
             transition: all 0.3s;
         }
