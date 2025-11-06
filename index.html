@@ -451,6 +451,57 @@
             100% { transform: scale(2); opacity: 0; }
         }
         
+        /* ПАУЗА И МЕНЮ */
+        #pause-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            gap: 20px;
+        }
+        
+        #pause-menu.show {
+            display: flex;
+        }
+        
+        .menu-button {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-size: 24px;
+            color: #FFD700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 200px;
+        }
+        
+        .menu-button:active {
+            transform: scale(0.95);
+        }
+        
+        #pause-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 8px 15px;
+            color: #FFD700;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
         @media (max-width: 400px) {
             #xsdc-amount { font-size: 36px; }
             #xsdc-label { font-size: 16px; }
@@ -459,6 +510,7 @@
             #notification { font-size: 22px; padding: 20px 30px; }
             .stat { font-size: 12px; padding: 8px; }
             .stat-value { font-size: 18px; }
+            .menu-button { font-size: 20px; padding: 12px 25px; min-width: 180px; }
         }
     </style>
 </head>
@@ -466,6 +518,8 @@
     <div id="quantum-bg"></div>
 
     <div id="game">
+        <button id="pause-button">⏸️</button>
+        
         <div id="xsdc-counter">
             <div id="xsdc-amount">0</div>
             <div id="xsdc-label">$XSDC QUANTUM 💎</div>
@@ -508,6 +562,12 @@
         </div>
     </div>
 
+    <div id="pause-menu">
+        <div class="menu-button" id="resume-button">ПРОДОЛЖИТЬ</div>
+        <div class="menu-button" id="restart-button">ЗАНОВО</div>
+        <div class="menu-button" id="help-button">ПОМОЩЬ</div>
+    </div>
+
     <div id="active-effects"></div>
     <div id="notification"></div>
 
@@ -530,6 +590,8 @@
         let activeTargets = [];
         let timeRipples = [];
         let emotionalIntensity = 0;
+        let isPaused = false;
+        let gameStarted = false;
         
         // БУСТЕРЫ
         let boosters = {
@@ -549,9 +611,16 @@
         const activeEffects = document.getElementById('active-effects');
         const quantumBg = document.getElementById('quantum-bg');
         const xsdcCounter = document.getElementById('xsdc-counter');
+        const pauseMenu = document.getElementById('pause-menu');
+        const pauseButton = document.getElementById('pause-button');
+        const resumeButton = document.getElementById('resume-button');
+        const restartButton = document.getElementById('restart-button');
+        const helpButton = document.getElementById('help-button');
         
         // ОБНОВЛЕНИЕ $XSDC
         function updateXSDC(amount) {
+            if (isPaused) return 0;
+            
             const bonus = multiplier * (boosters.x2.active ? 2 : 1);
             const finalAmount = Math.floor(amount * bonus);
             xsdc += finalAmount;
@@ -571,6 +640,8 @@
         
         // ОБНОВЛЕНИЕ КОМБО
         function updateCombo() {
+            if (isPaused) return;
+            
             combo++;
             emotionalIntensity = Math.min(1, combo * 0.05);
             
@@ -595,6 +666,8 @@
         
         // СБРОС КОМБО
         function resetCombo() {
+            if (isPaused) return;
+            
             if (combo > 10) {
                 showNotification('💔 РАЗРЫВ СВЯЗИ');
                 if (tg) tg.HapticFeedback.notificationOccurred('error');
@@ -621,6 +694,8 @@
         
         // ВРЕМЕННАЯ РЯБЬ
         function createTimeRipple(x, y) {
+            if (isPaused) return;
+            
             const ripple = document.createElement('div');
             ripple.className = 'time-ripple';
             ripple.style.left = (x - 150) + 'px';
@@ -643,6 +718,8 @@
         
         // СЛЕД ОТ КАСАНИЯ
         function createFingerTrail(x, y) {
+            if (isPaused) return;
+            
             const trail = document.createElement('div');
             trail.className = 'finger-trail';
             trail.style.left = (x - 10) + 'px';
@@ -654,6 +731,8 @@
         
         // СПАВН ЦЕЛИ
         function spawnTarget() {
+            if (isPaused || !gameStarted) return;
+            
             const target = document.createElement('div');
             target.className = 'target';
             
@@ -713,8 +792,12 @@
             // ЭМПАТИЯ - цели чувствуют игрока
             if (emotionalIntensity > 0.5 && type === 'bomb') {
                 // Бомбы пытаются убежать
-                setInterval(() => {
-                    if (!target.parentNode) return;
+                const escapeInterval = setInterval(() => {
+                    if (!target.parentNode || isPaused) {
+                        clearInterval(escapeInterval);
+                        return;
+                    }
+                    
                     const currentX = parseFloat(target.style.left);
                     const currentY = parseFloat(target.style.top);
                     
@@ -742,7 +825,7 @@
             // Автоудаление
             const lifetime = Math.max(2000, 4000 / spawnSpeed);
             setTimeout(() => {
-                if (target.parentNode && !boosters.magnet.active) {
+                if (target.parentNode && !boosters.magnet.active && !isPaused) {
                     target.remove();
                     activeTargets = activeTargets.filter(t => t !== target);
                     
@@ -753,7 +836,7 @@
             }, lifetime);
             
             // МАГНИТ
-            if (boosters.magnet.active) {
+            if (boosters.magnet.active && !isPaused) {
                 setTimeout(() => {
                     if (target.parentNode) {
                         handleTargetClick(target);
@@ -762,7 +845,7 @@
             }
             
             // КВАНТОВАЯ ДУПЛИКАЦИЯ
-            if (boosters.quantum.active && type !== 'bomb') {
+            if (boosters.quantum.active && type !== 'bomb' && !isPaused) {
                 setTimeout(() => {
                     createQuantumGhost(target);
                 }, 500);
@@ -771,7 +854,7 @@
         
         // КВАНТОВЫЙ ПРИЗРАК
         function createQuantumGhost(original) {
-            if (!original.parentNode) return;
+            if (!original.parentNode || isPaused) return;
             
             const ghost = original.cloneNode(true);
             ghost.classList.add('target-ghost');
@@ -794,6 +877,8 @@
         
         // ОБРАБОТКА КЛИКА
         function handleTargetClick(target) {
+            if (isPaused) return;
+            
             const type = target.dataset.type;
             const value = parseInt(target.dataset.value);
             const rect = target.getBoundingClientRect();
@@ -840,6 +925,8 @@
         
         // ВЗРЫВ
         function createExplosion(x, y, text, color) {
+            if (isPaused) return;
+            
             const exp = document.createElement('div');
             exp.className = 'explosion';
             exp.textContent = text;
@@ -854,6 +941,8 @@
         
         // ЧАСТИЦЫ
         function createParticles(x, y, type) {
+            if (isPaused) return;
+            
             const colors = {
                 xsdc: ['#FFD700', '#FF6B00'],
                 mega: ['#FF00FF', '#00FFFF'],
@@ -883,6 +972,8 @@
         
         // УВЕДОМЛЕНИЕ
         function showNotification(text) {
+            if (isPaused) return;
+            
             notification.textContent = text;
             notification.className = 'show-notification';
             
@@ -893,6 +984,7 @@
         
         // АКТИВАЦИЯ БУСТЕРА
         function activateBooster(type) {
+            if (isPaused) return;
             if (boosters[type].count <= 0 || boosters[type].active) return;
             
             boosters[type].count--;
@@ -948,7 +1040,9 @@
         }
         
         // ТАЙМЕР ЭФФЕКТОВ
-        setInterval(() => {
+        const effectInterval = setInterval(() => {
+            if (isPaused) return;
+            
             for (const type in boosters) {
                 if (boosters[type].active) {
                     boosters[type].duration--;
@@ -975,7 +1069,9 @@
         document.getElementById('boost-quantum').addEventListener('click', () => activateBooster('quantum'));
         
         // ВОССТАНОВЛЕНИЕ БУСТЕРОВ
-        setInterval(() => {
+        const boosterInterval = setInterval(() => {
+            if (isPaused) return;
+            
             for (const type in boosters) {
                 if (boosters[type].count < 5 && Math.random() > 0.92) {
                     boosters[type].count++;
@@ -988,7 +1084,9 @@
         
         // СПАВН ЦЕЛЕЙ
         function startSpawning() {
-            setInterval(() => {
+            const spawnInterval = setInterval(() => {
+                if (isPaused || !gameStarted) return;
+                
                 const count = Math.floor(spawnSpeed) + (Math.random() > 0.7 ? 1 : 0);
                 for (let i = 0; i < count; i++) {
                     setTimeout(() => spawnTarget(), i * 200);
@@ -1001,6 +1099,8 @@
         let lastTouchY = 0;
         
         document.addEventListener('touchmove', (e) => {
+            if (isPaused) return;
+            
             const touch = e.touches[0];
             createFingerTrail(touch.clientX, touch.clientY);
             
@@ -1013,6 +1113,83 @@
             lastTouchX = touch.clientX;
             lastTouchY = touch.clientY;
         }, { passive: true });
+        
+        // ПАУЗА И МЕНЮ
+        pauseButton.addEventListener('click', togglePause);
+        resumeButton.addEventListener('click', togglePause);
+        restartButton.addEventListener('click', restartGame);
+        helpButton.addEventListener('click', showHelp);
+        
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseMenu.classList.add('show');
+                pauseButton.textContent = '▶️';
+            } else {
+                pauseMenu.classList.remove('show');
+                pauseButton.textContent = '⏸️';
+            }
+        }
+        
+        function restartGame() {
+            if (!confirm('Начать заново? Весь прогресс будет потерян.')) return;
+            
+            xsdc = 0;
+            combo = 0;
+            multiplier = 1;
+            spawnSpeed = 1.0;
+            emotionalIntensity = 0;
+            
+            // Сброс бустеров
+            boosters = {
+                x2: { count: 3, active: false, duration: 0 },
+                frenzy: { count: 2, active: false, duration: 0 },
+                magnet: { count: 2, active: false, duration: 0 },
+                quantum: { count: 1, active: false, duration: 0 }
+            };
+            
+            // Очистка поля
+            activeTargets.forEach(target => target.remove());
+            activeTargets = [];
+            
+            // Обновление UI
+            xsdcAmount.textContent = '0';
+            comboValue.textContent = 'x1';
+            multValue.textContent = 'x1';
+            speedValue.textContent = '1.0';
+            updateBoosterUI();
+            
+            // Очистка эффектов
+            document.querySelectorAll('.effect-badge').forEach(badge => badge.remove());
+            
+            // Выход из паузы
+            isPaused = false;
+            pauseMenu.classList.remove('show');
+            pauseButton.textContent = '⏸️';
+            
+            showNotification('🔄 НОВАЯ ИГРА');
+        }
+        
+        function showHelp() {
+            alert(`$XSDC QUANTUM CHAOS - ПРАВИЛА:
+
+💎 Обычные цели: +10 $XSDC
+💥 Мега цели: +50 $XSDC
+💣 Бомбы: +100 $XSDC, но сбрасывают комбо
+🌀 Квантовые цели: +25 $XSDC и создают призраков
+
+⚡ Комбо: Увеличивается при попадании
+🔥 Множитель: Растет каждые 5 комбо
+💨 Резонанс: Ускоряет игру с ростом комбо
+
+БУСТЕРЫ:
+2️⃣✖️ Удвоение: Удваивает награду на 10 сек
+🌪️ Безумие: Создает 25 целей сразу
+🧲 Магнетизм: Автоматически собирает цели 6 сек
+🌀 Квант: Создает призраков целей 12 сек
+
+Нажимайте цели для сбора $XSDC и поддержания комбо!`);
+        }
         
         // СОХРАНЕНИЕ ПРОГРЕССА
         function saveProgress() {
@@ -1062,6 +1239,7 @@
         
         setTimeout(() => {
             showNotification('💎 НАЧИНАЙ ФАРМ! 💎');
+            gameStarted = true;
         }, 1500);
         
         startSpawning();
