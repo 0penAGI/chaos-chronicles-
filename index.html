@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ща<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -82,7 +82,7 @@
             display: flex;
             flex-direction: column;
             /* Добавляем 55px только сверху, остальные отступы 10px как было */
-            padding-top: 77px; 
+            padding-top: 66px; 
             padding-left: 10px;
             padding-right: 10px;
             padding-bottom: 10px;
@@ -497,7 +497,7 @@
         
         #pause-button {
             position: fixed;
-            top: 10px;
+            top: 77px;
             left: 10px;
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #FFD700;
@@ -534,15 +534,15 @@
         
         <div id="stats">
             <div id="combo" class="stat">
-                ⚡ КОМБО
+                ⚡ COMBO
                 <div class="stat-value" id="combo-value">x1</div>
             </div>
             <div id="multiplier" class="stat">
-                🔥 МНОЖ
+                🔥 XXX
                 <div class="stat-value" id="mult-value">x1</div>
             </div>
             <div id="speed" class="stat">
-                💨 РЕЗОНАНС
+                💨 RESONANCE
                 <div class="stat-value" id="speed-value">1.0</div>
             </div>
         </div>
@@ -570,9 +570,9 @@
     </div>
 
     <div id="pause-menu">
-        <div class="menu-button" id="resume-button">ПРОДОЛЖИТЬ</div>
-        <div class="menu-button" id="restart-button">ЗАНОВО</div>
-        <div class="menu-button" id="help-button">ПОМОЩЬ</div>
+        <div class="menu-button" id="resume-button">RESUME</div>
+        <div class="menu-button" id="restart-button">RESTART</div>
+        <div class="menu-button" id="help-button">HELP</div>
     </div>
 
     <div id="active-effects"></div>
@@ -656,7 +656,7 @@
             if (combo % 5 === 0) {
                 multiplier = Math.min(15, multiplier + 1);
                 multValue.textContent = 'x' + multiplier;
-                showNotification(`🔥 x${multiplier} ОГОНЬ!`);
+                showNotification(`🔥 x${multiplier} FIRE!`);
                 
                 if (tg) tg.HapticFeedback.notificationOccurred('success');
             }
@@ -676,7 +676,7 @@
             if (isPaused) return;
             
             if (combo > 10) {
-                showNotification('💔 РАЗРЫВ СВЯЗИ');
+                showNotification('💔 LOST CONNECTION');
                 if (tg) tg.HapticFeedback.notificationOccurred('error');
             }
             combo = 0;
@@ -893,7 +893,7 @@
             const centerY = rect.top + rect.height / 2;
             
             if (type === 'bomb') {
-                createExplosion(centerX, centerY, '💥БАБАХ💥', '#FF0000');
+                createExplosion(centerX, centerY, '💥BOOM💥', '#FF0000');
                 const earned = updateXSDC(value);
                 resetCombo();
                 showNotification('💣 +' + earned + ' $XSDC');
@@ -1002,16 +1002,16 @@
             addEffectBadge(type);
             
             if (type === 'frenzy') {
-                showNotification('🌪️ БЕЗУМИЕ!');
+                showNotification('🌪️ CHAOS!');
                 for (let i = 0; i < 25; i++) {
                     setTimeout(() => spawnTarget(), i * 150);
                 }
             } else if (type === 'quantum') {
-                showNotification('🌀 ВРЕМЯ НЕЛИНЕЙНО!');
+                showNotification('🌀 TIME MANIPULATION!');
             } else if (type === 'x2') {
-                showNotification('2️⃣✖️ УДВОЕНИЕ!');
+                showNotification('2️⃣✖️ XXX!');
             } else if (type === 'magnet') {
-                showNotification('🧲 МАГНЕТИЗМ!');
+                showNotification('🧲 MAGNETISM!');
             }
             
             if (tg) tg.HapticFeedback.notificationOccurred('success');
@@ -1063,7 +1063,7 @@
                         boosters[type].active = false;
                         const badge = document.getElementById('badge-' + type);
                         if (badge) badge.remove();
-                        showNotification('⏰ ЭФФЕКТ ЗАКОНЧИЛСЯ');
+                        showNotification('⏰ EFFECT OVER');
                     }
                 }
             }
@@ -1083,7 +1083,7 @@
                 if (boosters[type].count < 5 && Math.random() > 0.92) {
                     boosters[type].count++;
                     updateBoosterUI();
-                    showNotification('✨ ' + { x2: '2X', frenzy: 'БЕЗУМИЕ', magnet: 'МАГНИТ', quantum: 'КВАНТ' }[type] + ' ВОССТ.');
+                    showNotification('✨ ' + { x2: '2X', frenzy: 'MADNESS', magnet: 'MAGNET', quantum: 'QUANT' }[type] + ' HEAL.');
                     if (tg) tg.HapticFeedback.impactOccurred('light');
                 }
             }
@@ -1139,7 +1139,7 @@
         }
         
         function restartGame() {
-            if (!confirm('Начать заново? Весь прогресс будет потерян.')) return;
+            if (!confirm('TRY AGAIN? All progress will drown.')) return;
             
             xsdc = 0;
             combo = 0;
@@ -1174,28 +1174,28 @@
             pauseMenu.classList.remove('show');
             pauseButton.textContent = '⏸️';
             
-            showNotification('🔄 НОВАЯ ИГРА');
+            showNotification('🔄 NEW GAME');
         }
         
         function showHelp() {
-            alert(`$XSDC QUANTUM CHAOS - ПРАВИЛА:
+            alert(`$XSDC QUANTUM CHAOS - RULES:
 
-💎 Обычные цели: +10 $XSDC
-💥 Мега цели: +50 $XSDC
-💣 Бомбы: +100 $XSDC, но сбрасывают комбо
-🌀 Квантовые цели: +25 $XSDC и создают призраков
+💎 Common target: +10 $XSDC
+💥 Mega target: +50 $XSDC
+💣 Bombs: +100 $XSDC, but loose combo
+🌀 Quantum targets: +25 $XSDC and spawn a GHOST
 
-⚡ Комбо: Увеличивается при попадании
-🔥 Множитель: Растет каждые 5 комбо
-💨 Резонанс: Ускоряет игру с ростом комбо
+⚡ Combo: Increases when you hit targets
+🔥 Multiplier: Grows every 5 combo
+💨 Resonance: Speeds up gameplay as combo rises
 
-БУСТЕРЫ:
-2️⃣✖️ Удвоение: Удваивает награду на 10 сек
-🌪️ Безумие: Создает 25 целей сразу
-🧲 Магнетизм: Автоматически собирает цели 6 сек
-🌀 Квант: Создает призраков целей 12 сек
+BOOSTERS:
+2️⃣✖️ Double Up: Doubles rewards for 10s
+🌪️ Mayhem: Spawns 25 targets instantly
+🧲 Magnetism: Auto-collects targets for 6s
+🌀 Quantum: Creates ghost targets for 12s
 
-Нажимайте цели для сбора $XSDC и поддержания комбо!`);
+Use targets for $XSDC and combo!`);
         }
         
         // СОХРАНЕНИЕ ПРОГРЕССА
