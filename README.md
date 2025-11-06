@@ -1,6 +1,6 @@
 ##**XSDC QUANTUM CHAOS 💥
 
-![Chaos Chronicles](https://img.shields.io/badge/Game-Chaos_Chronicles-red)
+![$XSDC QUANTUM CHAOS](https://img.shields.io/badge/Game-Chaos_Chronicles-red)
 ![AI Powered](https://img.shields.io/badge/AI-$XSDC-purple)
 ![Platform](https://img.shields.io/badge/Platform-Web-green)
 
