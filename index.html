@@ -1,697 +1,1086 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>💥 $XSDC CHAOS FARM 💥</title>
+    <meta name="telegram-web-app" content="true">
+    <title>💥 $XSDC QUANTUM CHAOS 💥</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-```
-    body {
-        font-family: 'Impact', 'Arial Black', sans-serif;
-        background: #000;
-        color: #FFF;
-        overflow: hidden;
-        height: 100vh;
-        position: relative;
-    }
-    
-    /* ВЗРЫВНОЙ ФОН */
-    #chaos-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, #FF0000, #FF6B00, #FFD700, #00FF00, #00FFFF, #0000FF, #FF00FF);
-        background-size: 400% 400%;
-        animation: chaosWave 3s infinite;
-        opacity: 0.3;
-        z-index: 0;
-    }
-    
-    @keyframes chaosWave {
-        0%, 100% { background-position: 0% 50%; filter: hue-rotate(0deg); }
-        50% { background-position: 100% 50%; filter: hue-rotate(360deg); }
-    }
-    
-    /* ОСНОВНОЙ КОНТЕЙНЕР */
-    #game {
-        position: relative;
-        z-index: 1;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        padding: 15px;
-        justify-content: space-between;
-    }
-    
-    /* СЧЕТЧИК $XSDC */
-    #xsdc-counter {
-        text-align: center;
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.9);
-        border-radius: 20px;
-        border: 4px solid #FFD700;
-        box-shadow: 0 0 30px #FFD700, inset 0 0 20px rgba(255, 215, 0, 0.3);
-        animation: pulse 1s infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 0 30px #FFD700; }
-        50% { transform: scale(1.05); box-shadow: 0 0 50px #FFD700, 0 0 80px #FF6B00; }
-    }
-    
-    #xsdc-amount {
-        font-size: 48px;
-        font-weight: bold;
-        color: #FFD700;
-        text-shadow: 0 0 20px #FFD700, 0 0 40px #FF6B00;
-        letter-spacing: 2px;
-    }
-    
-    #xsdc-label {
-        font-size: 24px;
-        color: #FFF;
-        margin-top: 5px;
-        text-shadow: 0 0 10px #00FFFF;
-    }
-    
-    /* СТАТИСТИКА */
-    #stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 10px;
-        margin: 15px 0;
-    }
-    
-    .stat {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 12px;
-        border-radius: 10px;
-        border: 2px solid;
-        text-align: center;
-        font-size: 14px;
-        font-weight: bold;
-    }
-    
-    .stat-value {
-        font-size: 20px;
-        margin-top: 5px;
-    }
-    
-    #combo { border-color: #FF00FF; color: #FF00FF; }
-    #multiplier { border-color: #00FF00; color: #00FF00; }
-    #speed { border-color: #00FFFF; color: #00FFFF; }
-    
-    /* ИГРОВОЕ ПОЛЕ */
-    #field {
-        flex: 1;
-        position: relative;
-        background: rgba(0, 0, 0, 0.5);
-        border: 3px solid #FF6B00;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: inset 0 0 50px rgba(255, 107, 0, 0.5);
-    }
-    
-    /* ЦЕЛИ ДЛЯ КЛИКА */
-    .target {
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 36px;
-        font-weight: bold;
-        cursor: pointer;
-        animation: targetFloat 2s infinite;
-        transition: transform 0.1s;
-        user-select: none;
-    }
-    
-    @keyframes targetFloat {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-10px) rotate(180deg); }
-    }
-    
-    .target:active {
-        transform: scale(0.8) !important;
-    }
-    
-    .target-xsdc {
-        background: radial-gradient(circle, #FFD700, #FF6B00);
-        border: 4px solid #FFF;
-        box-shadow: 0 0 30px #FFD700;
-    }
-    
-    .target-mega {
-        background: radial-gradient(circle, #FF00FF, #00FFFF);
-        border: 4px solid #FFF;
-        box-shadow: 0 0 40px #FF00FF;
-        animation: megaPulse 0.5s infinite;
-    }
-    
-    @keyframes megaPulse {
-        0%, 100% { transform: scale(1) rotate(0deg); }
-        50% { transform: scale(1.1) rotate(180deg); }
-    }
-    
-    .target-bomb {
-        background: radial-gradient(circle, #FF0000, #000);
-        border: 4px solid #FF0000;
-        box-shadow: 0 0 30px #FF0000;
-    }
-    
-    /* ЭФФЕКТЫ ВЗРЫВА */
-    .explosion {
-        position: absolute;
-        pointer-events: none;
-        font-size: 60px;
-        font-weight: bold;
-        animation: explode 1s forwards;
-        z-index: 100;
-    }
-    
-    @keyframes explode {
-        0% { transform: scale(0) rotate(0deg); opacity: 1; }
-        50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
-        100% { transform: scale(2) rotate(360deg); opacity: 0; }
-    }
-    
-    .particle {
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        pointer-events: none;
-        animation: particleFly 1s forwards;
-    }
-    
-    @keyframes particleFly {
-        0% { transform: translate(0, 0) scale(1); opacity: 1; }
-        100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-    }
-    
-    /* БУСТЕРЫ */
-    #boosters {
-        display: flex;
-        justify-content: space-around;
-        gap: 10px;
-        padding: 10px 0;
-    }
-    
-    .booster {
-        flex: 1;
-        padding: 15px;
-        background: rgba(0, 0, 0, 0.9);
-        border: 3px solid;
-        border-radius: 15px;
-        font-size: 28px;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        text-align: center;
-    }
-    
-    .booster:active:not(.disabled) {
-        transform: scale(0.95);
-    }
-    
-    .booster.disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-    
-    #boost-x2 { border-color: #00FF00; }
-    #boost-frenzy { border-color: #FF00FF; }
-    #boost-magnet { border-color: #00FFFF; }
-    
-    .booster-count {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background: #FF0000;
-        color: #FFF;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        font-weight: bold;
-        border: 2px solid #000;
-    }
-    
-    /* АКТИВНЫЕ ЭФФЕКТЫ */
-    #active-effects {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        z-index: 10;
-    }
-    
-    .effect-badge {
-        background: rgba(0, 0, 0, 0.9);
-        padding: 8px 15px;
-        border-radius: 20px;
-        border: 2px solid;
-        font-size: 14px;
-        font-weight: bold;
-        animation: badgePulse 0.5s infinite;
-    }
-    
-    @keyframes badgePulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-    
-    /* УВЕДОМЛЕНИЯ */
-    #notification {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        background: rgba(0, 0, 0, 0.95);
-        padding: 30px 50px;
-        border-radius: 20px;
-        border: 4px solid #FFD700;
-        font-size: 32px;
-        font-weight: bold;
-        text-align: center;
-        z-index: 1000;
-        box-shadow: 0 0 50px #FFD700;
-        pointer-events: none;
-    }
-    
-    .show-notification {
-        animation: showNotif 1s forwards;
-    }
-    
-    @keyframes showNotif {
-        0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); }
-        50% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
-        100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-    }
-    
-    /* АДАПТАЦИЯ */
-    @media (max-width: 480px) {
-        #xsdc-amount { font-size: 36px; }
-        #xsdc-label { font-size: 18px; }
-        .target { width: 60px; height: 60px; font-size: 28px; }
-        .booster { font-size: 24px; padding: 12px; }
-        #notification { font-size: 24px; padding: 20px 30px; }
-    }
-    
-    @media (max-height: 600px) {
-        #xsdc-counter { padding: 15px; }
-        #stats { margin: 10px 0; }
-        .stat { padding: 8px; font-size: 12px; }
-        .stat-value { font-size: 16px; }
-    }
-</style>
-```
-
+        body {
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            background: #000;
+            color: #FFF;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+            overscroll-behavior: none;
+        }
+        
+        /* ЖИВОЙ КВАНТОВЫЙ ФОН */
+        #quantum-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                #FF0000, #FF6B00, #FFD700, #00FF00, #00FFFF, #0000FF, #FF00FF, #FF0000);
+            background-size: 400% 400%;
+            animation: quantumPulse 3s infinite;
+            opacity: 0.3;
+            z-index: 0;
+            transition: opacity 0.3s, filter 0.3s;
+        }
+        
+        @keyframes quantumPulse {
+            0%, 100% { 
+                background-position: 0% 50%; 
+                filter: hue-rotate(0deg) brightness(1);
+            }
+            25% { 
+                background-position: 50% 100%; 
+                filter: hue-rotate(90deg) brightness(1.2);
+            }
+            50% { 
+                background-position: 100% 50%; 
+                filter: hue-rotate(180deg) brightness(1.5);
+            }
+            75% { 
+                background-position: 50% 0%; 
+                filter: hue-rotate(270deg) brightness(1.2);
+            }
+        }
+        
+        /* ВРЕМЕННЫЕ РЯБЬ */
+        .time-ripple {
+            position: fixed;
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: rippleExpand 2s forwards;
+            z-index: 1;
+        }
+        
+        @keyframes rippleExpand {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 300px; height: 300px; opacity: 0; }
+        }
+        
+        #game {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            justify-content: space-between;
+        }
+        
+        /* СЧЕТЧИК С ПУЛЬСАЦИЕЙ */
+        #xsdc-counter {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 20px;
+            border: 4px solid #FFD700;
+            box-shadow: 0 0 30px var(--glow-color, #FFD700);
+            animation: counterPulse 1s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #xsdc-counter::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        @keyframes counterPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 30px var(--glow-color, #FFD700);
+            }
+            50% { 
+                transform: scale(1.03); 
+                box-shadow: 0 0 50px var(--glow-color, #FFD700), 0 0 80px var(--glow-color, #FF6B00);
+            }
+        }
+        
+        #xsdc-amount {
+            font-size: 42px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 20px #FFD700, 0 0 40px #FF6B00;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #xsdc-label {
+            font-size: 18px;
+            color: #FFF;
+            margin-top: 5px;
+            text-shadow: 0 0 10px #00FFFF;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* СТАТИСТИКА */
+        #stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .stat {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px solid;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            margin-top: 5px;
+        }
+        
+        #combo { border-color: #FF00FF; color: #FF00FF; }
+        #multiplier { border-color: #00FF00; color: #00FF00; }
+        #speed { border-color: #00FFFF; color: #00FFFF; }
+        
+        /* ИГРОВОЕ ПОЛЕ */
+        #field {
+            flex: 1;
+            position: relative;
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid #FF6B00;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(255, 107, 0, 0.5);
+            touch-action: none;
+        }
+        
+        /* КВАНТОВЫЕ ЦЕЛИ */
+        .target {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s, filter 0.3s;
+            will-change: transform;
+        }
+        
+        .target:active {
+            transform: scale(0.7) !important;
+        }
+        
+        /* Обычная цель */
+        .target-xsdc {
+            background: radial-gradient(circle, #FFD700, #FF6B00);
+            border: 3px solid #FFF;
+            box-shadow: 0 0 25px #FFD700;
+            animation: targetFloat 2s infinite ease-in-out;
+        }
+        
+        @keyframes targetFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-15px) rotate(180deg) scale(1.05); }
+        }
+        
+        /* МЕГА цель */
+        .target-mega {
+            background: radial-gradient(circle, #FF00FF, #00FFFF);
+            border: 4px solid #FFF;
+            box-shadow: 0 0 40px #FF00FF;
+            animation: megaPulse 0.4s infinite, targetSpin 3s infinite linear;
+        }
+        
+        @keyframes megaPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        @keyframes targetSpin {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        /* БОМБА - убегает */
+        .target-bomb {
+            background: radial-gradient(circle, #FF0000, #000);
+            border: 4px solid #FF0000;
+            box-shadow: 0 0 30px #FF0000;
+            animation: bombShake 0.2s infinite;
+        }
+        
+        @keyframes bombShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px) rotate(-5deg); }
+            75% { transform: translateX(3px) rotate(5deg); }
+        }
+        
+        /* КВАНТОВАЯ цель - дублируется */
+        .target-quantum {
+            background: radial-gradient(circle, #9D00FF, #00FFFF, #FFD700);
+            border: 4px solid #FFF;
+            box-shadow: 0 0 50px #9D00FF;
+            animation: quantumShift 1s infinite;
+            filter: blur(1px);
+        }
+        
+        @keyframes quantumShift {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1) translateX(5px); }
+        }
+        
+        /* ПРИЗРАК цели */
+        .target-ghost {
+            opacity: 0.6;
+            pointer-events: none;
+            animation: ghostFade 1s forwards;
+        }
+        
+        @keyframes ghostFade {
+            0% { opacity: 0.6; }
+            100% { opacity: 0; }
+        }
+        
+        /* ВЗРЫВЫ */
+        .explosion {
+            position: fixed;
+            pointer-events: none;
+            font-size: 50px;
+            font-weight: bold;
+            animation: explode 0.8s forwards;
+            z-index: 100;
+        }
+        
+        @keyframes explode {
+            0% { 
+                transform: scale(0) rotate(0deg); 
+                opacity: 1; 
+                filter: blur(0);
+            }
+            50% { 
+                transform: scale(1.5) rotate(180deg); 
+                opacity: 1;
+                filter: blur(2px);
+            }
+            100% { 
+                transform: scale(2.5) rotate(360deg); 
+                opacity: 0;
+                filter: blur(5px);
+            }
+        }
+        
+        /* ЧАСТИЦЫ */
+        .particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFly 1s forwards;
+            box-shadow: 0 0 5px currentColor;
+        }
+        
+        @keyframes particleFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { 
+                transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg); 
+                opacity: 0; 
+            }
+        }
+        
+        /* БУСТЕРЫ */
+        #boosters {
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        
+        .booster {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid;
+            border-radius: 15px;
+            font-size: 26px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .booster:active:not(.disabled) {
+            transform: scale(0.9);
+        }
+        
+        .booster.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        #boost-x2 { border-color: #00FF00; }
+        #boost-frenzy { border-color: #FF00FF; }
+        #boost-magnet { border-color: #00FFFF; }
+        #boost-quantum { border-color: #9D00FF; }
+        
+        .booster-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FF0000;
+            color: #FFF;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid #000;
+        }
+        
+        /* АКТИВНЫЕ ЭФФЕКТЫ */
+        #active-effects {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+        
+        .effect-badge {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 2px solid;
+            font-size: 13px;
+            font-weight: bold;
+            animation: badgePulse 0.5s infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* УВЕДОМЛЕНИЯ */
+        #notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 25px 40px;
+            border-radius: 20px;
+            border: 4px solid #FFD700;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 50px #FFD700;
+            pointer-events: none;
+            max-width: 80%;
+        }
+        
+        .show-notification {
+            animation: showNotif 1s forwards;
+        }
+        
+        @keyframes showNotif {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); }
+            50% { transform: translate(-50%, -50%) scale(1.15) rotate(10deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+        
+        /* СЛЕД ОТ ПАЛЬЦА */
+        .finger-trail {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.8), transparent);
+            pointer-events: none;
+            animation: trailFade 0.5s forwards;
+            z-index: 999;
+        }
+        
+        @keyframes trailFade {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        @media (max-width: 400px) {
+            #xsdc-amount { font-size: 36px; }
+            #xsdc-label { font-size: 16px; }
+            .target { width: 60px; height: 60px; font-size: 28px; }
+            .booster { font-size: 22px; padding: 10px; min-height: 55px; }
+            #notification { font-size: 22px; padding: 20px 30px; }
+            .stat { font-size: 12px; padding: 8px; }
+            .stat-value { font-size: 18px; }
+        }
+    </style>
 </head>
 <body>
-    <div id="chaos-bg"></div>
+    <div id="quantum-bg"></div>
 
-```
-<div id="game">
-    <!-- СЧЕТЧИК $XSDC -->
-    <div id="xsdc-counter">
-        <div id="xsdc-amount">0</div>
-        <div id="xsdc-label">$XSDC ФАРМ 💎</div>
+    <div id="game">
+        <div id="xsdc-counter">
+            <div id="xsdc-amount">0</div>
+            <div id="xsdc-label">$XSDC QUANTUM 💎</div>
+        </div>
+        
+        <div id="stats">
+            <div id="combo" class="stat">
+                ⚡ КОМБО
+                <div class="stat-value" id="combo-value">x1</div>
+            </div>
+            <div id="multiplier" class="stat">
+                🔥 МНОЖ
+                <div class="stat-value" id="mult-value">x1</div>
+            </div>
+            <div id="speed" class="stat">
+                💨 РЕЗОНАНС
+                <div class="stat-value" id="speed-value">1.0</div>
+            </div>
+        </div>
+        
+        <div id="field"></div>
+        
+        <div id="boosters">
+            <div class="booster" id="boost-x2">
+                2️⃣✖️
+                <div class="booster-count">3</div>
+            </div>
+            <div class="booster" id="boost-frenzy">
+                🌪️
+                <div class="booster-count">2</div>
+            </div>
+            <div class="booster" id="boost-magnet">
+                🧲
+                <div class="booster-count">2</div>
+            </div>
+            <div class="booster" id="boost-quantum">
+                🌀
+                <div class="booster-count">1</div>
+            </div>
+        </div>
     </div>
-    
-    <!-- СТАТИСТИКА -->
-    <div id="stats">
-        <div id="combo" class="stat">
-            ⚡ КОМБО
-            <div class="stat-value" id="combo-value">x1</div>
-        </div>
-        <div id="multiplier" class="stat">
-            🔥 МНОЖИТЕЛЬ
-            <div class="stat-value" id="mult-value">x1</div>
-        </div>
-        <div id="speed" class="stat">
-            💨 СКОРОСТЬ
-            <div class="stat-value" id="speed-value">1.0</div>
-        </div>
-    </div>
-    
-    <!-- ИГРОВОЕ ПОЛЕ -->
-    <div id="field"></div>
-    
-    <!-- БУСТЕРЫ -->
-    <div id="boosters">
-        <div class="booster" id="boost-x2">
-            2️⃣✖️
-            <div class="booster-count">3</div>
-        </div>
-        <div class="booster" id="boost-frenzy">
-            🌪️
-            <div class="booster-count">2</div>
-        </div>
-        <div class="booster" id="boost-magnet">
-            🧲
-            <div class="booster-count">2</div>
-        </div>
-    </div>
-</div>
 
-<!-- АКТИВНЫЕ ЭФФЕКТЫ -->
-<div id="active-effects"></div>
+    <div id="active-effects"></div>
+    <div id="notification"></div>
 
-<!-- УВЕДОМЛЕНИЯ -->
-<div id="notification"></div>
-
-<script>
-    // ПЕРЕМЕННЫЕ
-    let xsdc = 0;
-    let combo = 0;
-    let multiplier = 1;
-    let spawnSpeed = 1.0;
-    let activeTargets = [];
-    let spawnInterval;
-    
-    // БУСТЕРЫ
-    let boosters = {
-        x2: { count: 3, active: false, duration: 0 },
-        frenzy: { count: 2, active: false, duration: 0 },
-        magnet: { count: 2, active: false, duration: 0 }
-    };
-    
-    // ЭЛЕМЕНТЫ
-    const field = document.getElementById('field');
-    const xsdcAmount = document.getElementById('xsdc-amount');
-    const comboValue = document.getElementById('combo-value');
-    const multValue = document.getElementById('mult-value');
-    const speedValue = document.getElementById('speed-value');
-    const notification = document.getElementById('notification');
-    const activeEffects = document.getElementById('active-effects');
-    
-    // ОБНОВЛЕНИЕ СЧЕТЧИКА
-    function updateXSDC(amount) {
-        xsdc += amount * multiplier * (boosters.x2.active ? 2 : 1);
-        xsdcAmount.textContent = Math.floor(xsdc);
-        
-        // Анимация
-        xsdcAmount.style.animation = 'none';
-        setTimeout(() => xsdcAmount.style.animation = '', 10);
-        
-        // Виброотклик
-        if (navigator.vibrate && amount > 0) {
-            navigator.vibrate(30);
-        }
-    }
-    
-    // ОБНОВЛЕНИЕ КОМБО
-    function updateCombo() {
-        combo++;
-        
-        // Увеличиваем множитель каждые 5 кликов
-        if (combo % 5 === 0) {
-            multiplier = Math.min(10, multiplier + 1);
-            multValue.textContent = 'x' + multiplier;
-            showNotification(`🔥 МНОЖИТЕЛЬ x${multiplier}!`);
+    <script>
+        // TELEGRAM WEB APP
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.enableClosingConfirmation();
+            tg.setHeaderColor('#000000');
+            tg.setBackgroundColor('#000000');
         }
         
-        comboValue.textContent = 'x' + combo;
+        // ПЕРЕМЕННЫЕ
+        let xsdc = 0;
+        let combo = 0;
+        let multiplier = 1;
+        let spawnSpeed = 1.0;
+        let activeTargets = [];
+        let timeRipples = [];
+        let emotionalIntensity = 0;
         
-        // Увеличиваем скорость спавна
-        spawnSpeed = Math.min(3, 1 + combo * 0.05);
-        speedValue.textContent = spawnSpeed.toFixed(1);
-    }
-    
-    // СБРОС КОМБО
-    function resetCombo() {
-        if (combo > 10) {
-            showNotification('💔 КОМБО СБРОШЕНО!');
-        }
-        combo = 0;
-        multiplier = 1;
-        comboValue.textContent = 'x1';
-        multValue.textContent = 'x1';
-    }
-    
-    // СОЗДАНИЕ ЦЕЛИ
-    function spawnTarget() {
-        const target = document.createElement('div');
-        target.className = 'target';
+        // БУСТЕРЫ
+        let boosters = {
+            x2: { count: 3, active: false, duration: 0 },
+            frenzy: { count: 2, active: false, duration: 0 },
+            magnet: { count: 2, active: false, duration: 0 },
+            quantum: { count: 1, active: false, duration: 0 }
+        };
         
-        // Типы целей
-        const rand = Math.random();
-        let type, value, emoji;
+        // ЭЛЕМЕНТЫ
+        const field = document.getElementById('field');
+        const xsdcAmount = document.getElementById('xsdc-amount');
+        const comboValue = document.getElementById('combo-value');
+        const multValue = document.getElementById('mult-value');
+        const speedValue = document.getElementById('speed-value');
+        const notification = document.getElementById('notification');
+        const activeEffects = document.getElementById('active-effects');
+        const quantumBg = document.getElementById('quantum-bg');
+        const xsdcCounter = document.getElementById('xsdc-counter');
         
-        if (rand < 0.7) {
-            // Обычная $XSDC
-            type = 'xsdc';
-            value = 10;
-            emoji = '💎';
-            target.classList.add('target-xsdc');
-        } else if (rand < 0.9) {
-            // МЕГА $XSDC
-            type = 'mega';
-            value = 50;
-            emoji = '💥';
-            target.classList.add('target-mega');
-        } else {
-            // БОМБА (убирает комбо но дает бонус)
-            type = 'bomb';
-            value = 100;
-            emoji = '💣';
-            target.classList.add('target-bomb');
-        }
-        
-        target.innerHTML = emoji;
-        target.dataset.type = type;
-        target.dataset.value = value;
-        
-        // Случайная позиция
-        const fieldRect = field.getBoundingClientRect();
-        const maxX = fieldRect.width - 80;
-        const maxY = fieldRect.height - 80;
-        
-        target.style.left = Math.random() * maxX + 'px';
-        target.style.top = Math.random() * maxY + 'px';
-        
-        // Обработчик клика
-        target.addEventListener('click', () => handleTargetClick(target));
-        
-        field.appendChild(target);
-        activeTargets.push(target);
-        
-        // Автоудаление через время
-        setTimeout(() => {
-            if (target.parentNode && !boosters.magnet.active) {
-                target.remove();
-                activeTargets = activeTargets.filter(t => t !== target);
-                
-                // Теряем комбо если не успели кликнуть
-                if (type !== 'bomb') {
-                    resetCombo();
-                }
+        // ОБНОВЛЕНИЕ $XSDC
+        function updateXSDC(amount) {
+            const bonus = multiplier * (boosters.x2.active ? 2 : 1);
+            const finalAmount = Math.floor(amount * bonus);
+            xsdc += finalAmount;
+            xsdcAmount.textContent = Math.floor(xsdc);
+            
+            // Анимация счетчика
+            xsdcAmount.style.animation = 'none';
+            setTimeout(() => xsdcAmount.style.animation = '', 10);
+            
+            // Вибрация через Telegram
+            if (tg && finalAmount > 0) {
+                tg.HapticFeedback.impactOccurred('light');
             }
-        }, 3000 / spawnSpeed);
+            
+            return finalAmount;
+        }
         
-        // МАГНИТ - автосбор
-        if (boosters.magnet.active) {
+        // ОБНОВЛЕНИЕ КОМБО
+        function updateCombo() {
+            combo++;
+            emotionalIntensity = Math.min(1, combo * 0.05);
+            
+            // Увеличиваем множитель
+            if (combo % 5 === 0) {
+                multiplier = Math.min(15, multiplier + 1);
+                multValue.textContent = 'x' + multiplier;
+                showNotification(`🔥 x${multiplier} ОГОНЬ!`);
+                
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            }
+            
+            comboValue.textContent = 'x' + combo;
+            
+            // Ускорение
+            spawnSpeed = Math.min(3.5, 1 + combo * 0.06);
+            speedValue.textContent = spawnSpeed.toFixed(1);
+            
+            // Реакция фона
+            updateBackgroundResonance();
+        }
+        
+        // СБРОС КОМБО
+        function resetCombo() {
+            if (combo > 10) {
+                showNotification('💔 РАЗРЫВ СВЯЗИ');
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
+            }
+            combo = 0;
+            multiplier = 1;
+            emotionalIntensity = 0;
+            comboValue.textContent = 'x1';
+            multValue.textContent = 'x1';
+            updateBackgroundResonance();
+        }
+        
+        // РЕЗОНАНС ФОНА
+        function updateBackgroundResonance() {
+            const speed = Math.max(0.5, 3 - emotionalIntensity * 2.5);
+            const opacity = 0.3 + emotionalIntensity * 0.5;
+            quantumBg.style.animationDuration = speed + 's';
+            quantumBg.style.opacity = opacity;
+            
+            // Цвет свечения счетчика
+            const hue = emotionalIntensity * 360;
+            xsdcCounter.style.setProperty('--glow-color', `hsl(${hue}, 100%, 50%)`);
+        }
+        
+        // ВРЕМЕННАЯ РЯБЬ
+        function createTimeRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'time-ripple';
+            ripple.style.left = (x - 150) + 'px';
+            ripple.style.top = (y - 150) + 'px';
+            document.body.appendChild(ripple);
+            
+            const rippleData = {
+                x, y,
+                born: Date.now(),
+                resonance: combo * multiplier,
+                element: ripple
+            };
+            timeRipples.push(rippleData);
+            
             setTimeout(() => {
-                if (target.parentNode) {
-                    handleTargetClick(target);
+                ripple.remove();
+                timeRipples = timeRipples.filter(r => r !== rippleData);
+            }, 2000);
+        }
+        
+        // СЛЕД ОТ КАСАНИЯ
+        function createFingerTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'finger-trail';
+            trail.style.left = (x - 10) + 'px';
+            trail.style.top = (y - 10) + 'px';
+            document.body.appendChild(trail);
+            
+            setTimeout(() => trail.remove(), 500);
+        }
+        
+        // СПАВН ЦЕЛИ
+        function spawnTarget() {
+            const target = document.createElement('div');
+            target.className = 'target';
+            
+            // Типы целей
+            const rand = Math.random();
+            let type, value, emoji;
+            
+            if (rand < 0.55) {
+                type = 'xsdc';
+                value = 10;
+                emoji = '💎';
+                target.classList.add('target-xsdc');
+            } else if (rand < 0.75) {
+                type = 'mega';
+                value = 50;
+                emoji = '💥';
+                target.classList.add('target-mega');
+            } else if (rand < 0.90) {
+                type = 'bomb';
+                value = 100;
+                emoji = '💣';
+                target.classList.add('target-bomb');
+            } else {
+                type = 'quantum';
+                value = 25;
+                emoji = '🌀';
+                target.classList.add('target-quantum');
+            }
+            
+            target.innerHTML = emoji;
+            target.dataset.type = type;
+            target.dataset.value = value;
+            target.dataset.born = Date.now();
+            
+            // Позиция
+            const fieldRect = field.getBoundingClientRect();
+            const maxX = fieldRect.width - 70;
+            const maxY = fieldRect.height - 70;
+            
+            let x = Math.random() * maxX;
+            let y = Math.random() * maxY;
+            
+            // Избегаем других целей
+            for (const other of activeTargets) {
+                const ox = parseFloat(other.style.left);
+                const oy = parseFloat(other.style.top);
+                const dist = Math.sqrt((x - ox) ** 2 + (y - oy) ** 2);
+                if (dist < 80) {
+                    x = Math.random() * maxX;
+                    y = Math.random() * maxY;
                 }
-            }, 500);
-        }
-    }
-    
-    // ОБРАБОТКА КЛИКА
-    function handleTargetClick(target) {
-        const type = target.dataset.type;
-        const value = parseInt(target.dataset.value);
-        const rect = target.getBoundingClientRect();
-        
-        if (type === 'bomb') {
-            // БОМБА - большой бонус но сброс комбо
-            createExplosion(rect.left + 40, rect.top + 40, '💥💥💥', '#FF0000');
-            updateXSDC(value);
-            resetCombo();
-            showNotification('💣 БОМБА! +' + (value * multiplier));
-        } else {
-            // Обычный клик
-            createExplosion(rect.left + 40, rect.top + 40, '+' + (value * multiplier), '#FFD700');
-            updateXSDC(value);
-            updateCombo();
-        }
-        
-        // Частицы
-        createParticles(rect.left + 40, rect.top + 40);
-        
-        // Удаляем цель
-        target.remove();
-        activeTargets = activeTargets.filter(t => t !== target);
-    }
-    
-    // ВЗРЫВ
-    function createExplosion(x, y, text, color) {
-        const exp = document.createElement('div');
-        exp.className = 'explosion';
-        exp.textContent = text;
-        exp.style.left = x + 'px';
-        exp.style.top = y + 'px';
-        exp.style.color = color;
-        document.body.appendChild(exp);
-        
-        setTimeout(() => exp.remove(), 1000);
-    }
-    
-    // ЧАСТИЦЫ
-    function createParticles(x, y) {
-        for (let i = 0; i < 12; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = x + 'px';
-            p.style.top = y + 'px';
-            p.style.background = ['#FFD700', '#FF6B00', '#FF00FF', '#00FFFF'][Math.floor(Math.random() * 4)];
+            }
             
-            const angle = (Math.PI * 2 * i) / 12;
-            const dist = 100 + Math.random() * 50;
-            p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-            p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
             
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 1000);
+            // ЭМПАТИЯ - цели чувствуют игрока
+            if (emotionalIntensity > 0.5 && type === 'bomb') {
+                // Бомбы пытаются убежать
+                setInterval(() => {
+                    if (!target.parentNode) return;
+                    const currentX = parseFloat(target.style.left);
+                    const currentY = parseFloat(target.style.top);
+                    
+                    // Убегаем от центра
+                    const centerX = fieldRect.width / 2;
+                    const centerY = fieldRect.height / 2;
+                    const dx = currentX - centerX;
+                    const dy = currentY - centerY;
+                    const angle = Math.atan2(dy, dx);
+                    
+                    const newX = Math.max(0, Math.min(maxX, currentX + Math.cos(angle) * 3));
+                    const newY = Math.max(0, Math.min(maxY, currentY + Math.sin(angle) * 3));
+                    
+                    target.style.left = newX + 'px';
+                    target.style.top = newY + 'px';
+                }, 100);
+            }
+            
+            // Клик
+            target.addEventListener('click', () => handleTargetClick(target));
+            
+            field.appendChild(target);
+            activeTargets.push(target);
+            
+            // Автоудаление
+            const lifetime = Math.max(2000, 4000 / spawnSpeed);
+            setTimeout(() => {
+                if (target.parentNode && !boosters.magnet.active) {
+                    target.remove();
+                    activeTargets = activeTargets.filter(t => t !== target);
+                    
+                    if (type !== 'bomb') {
+                        resetCombo();
+                    }
+                }
+            }, lifetime);
+            
+            // МАГНИТ
+            if (boosters.magnet.active) {
+                setTimeout(() => {
+                    if (target.parentNode) {
+                        handleTargetClick(target);
+                    }
+                }, 300);
+            }
+            
+            // КВАНТОВАЯ ДУПЛИКАЦИЯ
+            if (boosters.quantum.active && type !== 'bomb') {
+                setTimeout(() => {
+                    createQuantumGhost(target);
+                }, 500);
+            }
         }
-    }
-    
-    // УВЕДОМЛЕНИЕ
-    function showNotification(text) {
-        notification.textContent = text;
-        notification.className = 'show-notification';
+        
+        // КВАНТОВЫЙ ПРИЗРАК
+        function createQuantumGhost(original) {
+            if (!original.parentNode) return;
+            
+            const ghost = original.cloneNode(true);
+            ghost.classList.add('target-ghost');
+            
+            const rect = original.getBoundingClientRect();
+            const fieldRect = field.getBoundingClientRect();
+            
+            const offsetX = (Math.random() - 0.5) * 100;
+            const offsetY = (Math.random() - 0.5) * 100;
+            
+            ghost.style.left = Math.max(0, Math.min(fieldRect.width - 70, 
+                parseFloat(original.style.left) + offsetX)) + 'px';
+            ghost.style.top = Math.max(0, Math.min(fieldRect.height - 70, 
+                parseFloat(original.style.top) + offsetY)) + 'px';
+            
+            field.appendChild(ghost);
+            
+            setTimeout(() => ghost.remove(), 1000);
+        }
+        
+        // ОБРАБОТКА КЛИКА
+        function handleTargetClick(target) {
+            const type = target.dataset.type;
+            const value = parseInt(target.dataset.value);
+            const rect = target.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            if (type === 'bomb') {
+                createExplosion(centerX, centerY, '💥БАБАХ💥', '#FF0000');
+                const earned = updateXSDC(value);
+                resetCombo();
+                showNotification('💣 +' + earned + ' $XSDC');
+                if (tg) tg.HapticFeedback.impactOccurred('heavy');
+            } else if (type === 'quantum') {
+                createExplosion(centerX, centerY, '🌀∞🌀', '#9D00FF');
+                const earned = updateXSDC(value);
+                updateCombo();
+                
+                // Квантовая награда - спавним 3 призрака
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        if (Math.random() > 0.5) spawnTarget();
+                    }, i * 200);
+                }
+                
+                if (tg) tg.HapticFeedback.impactOccurred('medium');
+            } else {
+                const earned = updateXSDC(value);
+                createExplosion(centerX, centerY, '+' + earned, '#FFD700');
+                updateCombo();
+                
+                if (tg) tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            // Временная рябь
+            createTimeRipple(centerX, centerY);
+            
+            // Частицы
+            createParticles(centerX, centerY, type);
+            
+            // Удаляем
+            target.remove();
+            activeTargets = activeTargets.filter(t => t !== target);
+        }
+        
+        // ВЗРЫВ
+        function createExplosion(x, y, text, color) {
+            const exp = document.createElement('div');
+            exp.className = 'explosion';
+            exp.textContent = text;
+            exp.style.left = x + 'px';
+            exp.style.top = y + 'px';
+            exp.style.color = color;
+            exp.style.textShadow = `0 0 20px ${color}`;
+            document.body.appendChild(exp);
+            
+            setTimeout(() => exp.remove(), 800);
+        }
+        
+        // ЧАСТИЦЫ
+        function createParticles(x, y, type) {
+            const colors = {
+                xsdc: ['#FFD700', '#FF6B00'],
+                mega: ['#FF00FF', '#00FFFF'],
+                bomb: ['#FF0000', '#FF6B00'],
+                quantum: ['#9D00FF', '#00FFFF', '#FFD700']
+            };
+            
+            const particleColors = colors[type] || colors.xsdc;
+            const count = type === 'mega' ? 20 : type === 'quantum' ? 16 : 12;
+            
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+                
+                const angle = (Math.PI * 2 * i) / count;
+                const dist = 80 + Math.random() * 60;
+                p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+                
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+        
+        // УВЕДОМЛЕНИЕ
+        function showNotification(text) {
+            notification.textContent = text;
+            notification.className = 'show-notification';
+            
+            setTimeout(() => {
+                notification.className = '';
+            }, 1000);
+        }
+        
+        // АКТИВАЦИЯ БУСТЕРА
+        function activateBooster(type) {
+            if (boosters[type].count <= 0 || boosters[type].active) return;
+            
+            boosters[type].count--;
+            boosters[type].active = true;
+            boosters[type].duration = type === 'x2' ? 10 : type === 'frenzy' ? 8 : type === 'magnet' ? 6 : 12;
+            
+            updateBoosterUI();
+            addEffectBadge(type);
+            
+            if (type === 'frenzy') {
+                showNotification('🌪️ БЕЗУМИЕ!');
+                for (let i = 0; i < 25; i++) {
+                    setTimeout(() => spawnTarget(), i * 150);
+                }
+            } else if (type === 'quantum') {
+                showNotification('🌀 ВРЕМЯ НЕЛИНЕЙНО!');
+            } else if (type === 'x2') {
+                showNotification('2️⃣✖️ УДВОЕНИЕ!');
+            } else if (type === 'magnet') {
+                showNotification('🧲 МАГНЕТИЗМ!');
+            }
+            
+            if (tg) tg.HapticFeedback.notificationOccurred('success');
+        }
+        
+        // UI БУСТЕРОВ
+        function updateBoosterUI() {
+            document.querySelector('#boost-x2 .booster-count').textContent = boosters.x2.count;
+            document.querySelector('#boost-frenzy .booster-count').textContent = boosters.frenzy.count;
+            document.querySelector('#boost-magnet .booster-count').textContent = boosters.magnet.count;
+            document.querySelector('#boost-quantum .booster-count').textContent = boosters.quantum.count;
+            
+            document.getElementById('boost-x2').classList.toggle('disabled', boosters.x2.count === 0);
+            document.getElementById('boost-frenzy').classList.toggle('disabled', boosters.frenzy.count === 0);
+            document.getElementById('boost-magnet').classList.toggle('disabled', boosters.magnet.count === 0);
+            document.getElementById('boost-quantum').classList.toggle('disabled', boosters.quantum.count === 0);
+        }
+        
+        // БЕЙДЖ ЭФФЕКТА
+        function addEffectBadge(type) {
+            const badge = document.createElement('div');
+            badge.className = 'effect-badge';
+            badge.id = 'badge-' + type;
+            
+            const emojis = { x2: '2️⃣✖️', frenzy: '🌪️', magnet: '🧲', quantum: '🌀' };
+            const colors = { x2: '#00FF00', frenzy: '#FF00FF', magnet: '#00FFFF', quantum: '#9D00FF' };
+            
+            badge.innerHTML = emojis[type] + ' <span id="timer-' + type + '">' + boosters[type].duration + '</span>с';
+            badge.style.borderColor = colors[type];
+            badge.style.color = colors[type];
+            
+            activeEffects.appendChild(badge);
+        }
+        
+        // ТАЙМЕР ЭФФЕКТОВ
+        setInterval(() => {
+            for (const type in boosters) {
+                if (boosters[type].active) {
+                    boosters[type].duration--;
+                    
+                    const timer = document.getElementById('timer-' + type);
+                    if (timer) {
+                        timer.textContent = boosters[type].duration;
+                    }
+                    
+                    if (boosters[type].duration <= 0) {
+                        boosters[type].active = false;
+                        const badge = document.getElementById('badge-' + type);
+                        if (badge) badge.remove();
+                        showNotification('⏰ ЭФФЕКТ ЗАКОНЧИЛСЯ');
+                    }
+                }
+            }
+        }, 1000);
+        
+        // ОБРАБОТЧИКИ БУСТЕРОВ
+        document.getElementById('boost-x2').addEventListener('click', () => activateBooster('x2'));
+        document.getElementById('boost-frenzy').addEventListener('click', () => activateBooster('frenzy'));
+        document.getElementById('boost-magnet').addEventListener('click', () => activateBooster('magnet'));
+        document.getElementById('boost-quantum').addEventListener('click', () => activateBooster('quantum'));
+        
+        // ВОССТАНОВЛЕНИЕ БУСТЕРОВ
+        setInterval(() => {
+            for (const type in boosters) {
+                if (boosters[type].count < 5 && Math.random() > 0.92) {
+                    boosters[type].count++;
+                    updateBoosterUI();
+                    showNotification('✨ ' + { x2: '2X', frenzy: 'БЕЗУМИЕ', magnet: 'МАГНИТ', quantum: 'КВАНТ' }[type] + ' ВОССТ.');
+                    if (tg) tg.HapticFeedback.impactOccurred('light');
+                }
+            }
+        }, 5000);
+        
+        // СПАВН ЦЕЛЕЙ
+        function startSpawning() {
+            setInterval(() => {
+                const count = Math.floor(spawnSpeed) + (Math.random() > 0.7 ? 1 : 0);
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => spawnTarget(), i * 200);
+                }
+            }, 1000);
+        }
+        
+        // ОТСЛЕЖИВАНИЕ КАСАНИЙ
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            createFingerTrail(touch.clientX, touch.clientY);
+            
+            // Обновляем позицию фона
+            const x = (touch.clientX / window.innerWidth) * 100;
+            const y = (touch.clientY / window.innerHeight) * 100;
+            quantumBg.style.setProperty('--mouse-x', x + '%');
+            quantumBg.style.setProperty('--mouse-y', y + '%');
+            
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+        }, { passive: true });
+        
+        // СОХРАНЕНИЕ ПРОГРЕССА
+        function saveProgress() {
+            if (window.storage) {
+                const data = {
+                    xsdc: xsdc,
+                    highScore: Math.max(xsdc, parseInt(localStorage.getItem('highScore') || '0')),
+                    boosters: boosters
+                };
+                localStorage.setItem('xsdc_progress', JSON.stringify(data));
+                localStorage.setItem('highScore', data.highScore.toString());
+            }
+        }
+        
+        // ЗАГРУЗКА ПРОГРЕССА
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem('xsdc_progress');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    xsdc = data.xsdc || 0;
+                    xsdcAmount.textContent = Math.floor(xsdc);
+                    
+                    if (data.boosters) {
+                        for (const type in data.boosters) {
+                            if (boosters[type]) {
+                                boosters[type].count = data.boosters[type].count || boosters[type].count;
+                            }
+                        }
+                        updateBoosterUI();
+                    }
+                }
+            } catch (e) {
+                console.log('Новая игра');
+            }
+        }
+        
+        // Автосохранение каждые 10 секунд
+        setInterval(saveProgress, 10000);
+        
+        // Сохранение при закрытии
+        window.addEventListener('beforeunload', saveProgress);
+        
+        // СТАРТ
+        loadProgress();
+        showNotification('🌀 КВАНТОВЫЙ РЕЗОНАНС 🌀');
         
         setTimeout(() => {
-            notification.className = '';
-        }, 1000);
-    }
-    
-    // БУСТЕРЫ
-    function activateBooster(type) {
-        if (boosters[type].count <= 0 || boosters[type].active) return;
+            showNotification('💎 НАЧИНАЙ ФАРМ! 💎');
+        }, 1500);
         
-        boosters[type].count--;
-        boosters[type].active = true;
-        boosters[type].duration = type === 'x2' ? 10 : type === 'frenzy' ? 8 : 6;
+        startSpawning();
         
-        updateBoosterUI();
-        addEffectBadge(type);
-        
-        if (type === 'frenzy') {
-            // БЕЗУМИЕ - спавним много целей
-            for (let i = 0; i < 20; i++) {
-                setTimeout(() => spawnTarget(), i * 200);
-            }
+        // Начальный спавн
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => spawnTarget(), i * 400);
         }
         
-        // Виброотклик
-        if (navigator.vibrate) {
-            navigator.vibrate([50, 50, 50]);
+        // Отправка данных в Telegram
+        if (tg) {
+            setInterval(() => {
+                tg.sendData(JSON.stringify({
+                    xsdc: Math.floor(xsdc),
+                    combo: combo,
+                    multiplier: multiplier
+                }));
+            }, 30000);
         }
-    }
-    
-    // ОБНОВЛЕНИЕ UI БУСТЕРОВ
-    function updateBoosterUI() {
-        document.querySelector('#boost-x2 .booster-count').textContent = boosters.x2.count;
-        document.querySelector('#boost-frenzy .booster-count').textContent = boosters.frenzy.count;
-        document.querySelector('#boost-magnet .booster-count').textContent = boosters.magnet.count;
-        
-        document.getElementById('boost-x2').classList.toggle('disabled', boosters.x2.count === 0);
-        document.getElementById('boost-frenzy').classList.toggle('disabled', boosters.frenzy.count === 0);
-        document.getElementById('boost-magnet').classList.toggle('disabled', boosters.magnet.count === 0);
-    }
-    
-    // БЕЙДЖ ЭФФЕКТА
-    function addEffectBadge(type) {
-        const badge = document.createElement('div');
-        badge.className = 'effect-badge';
-        badge.id = 'badge-' + type;
-        
-        const emoji = type === 'x2' ? '2️⃣✖️' : type === 'frenzy' ? '🌪️' : '🧲';
-        badge.innerHTML = emoji + ' <span id="timer-' + type + '">' + boosters[type].duration + '</span>с';
-        badge.style.borderColor = type === 'x2' ? '#00FF00' : type === 'frenzy' ? '#FF00FF' : '#00FFFF';
-        badge.style.color = badge.style.borderColor;
-        
-        activeEffects.appendChild(badge);
-    }
-    
-    // ТАЙМЕР ЭФФЕКТОВ
-    setInterval(() => {
-        for (const type in boosters) {
-            if (boosters[type].active) {
-                boosters[type].duration--;
-                
-                const timer = document.getElementById('timer-' + type);
-                if (timer) {
-                    timer.textContent = boosters[type].duration;
-                }
-                
-                if (boosters[type].duration <= 0) {
-                    boosters[type].active = false;
-                    const badge = document.getElementById('badge-' + type);
-                    if (badge) badge.remove();
-                }
-            }
-        }
-    }, 1000);
-    
-    // ОБРАБОТЧИКИ БУСТЕРОВ
-    document.getElementById('boost-x2').addEventListener('click', () => activateBooster('x2'));
-    document.getElementById('boost-frenzy').addEventListener('click', () => activateBooster('frenzy'));
-    document.getElementById('boost-magnet').addEventListener('click', () => activateBooster('magnet'));
-    
-    // ВОССТАНОВЛЕНИЕ БУСТЕРОВ
-    setInterval(() => {
-        for (const type in boosters) {
-            if (boosters[type].count < 5 && Math.random() > 0.95) {
-                boosters[type].count++;
-                updateBoosterUI();
-                showNotification('✨ БУСТЕР ВОССТАНОВЛЕН!');
-            }
-        }
-    }, 5000);
-    
-    // СПАВН ЦЕЛЕЙ
-    function startSpawning() {
-        spawnInterval = setInterval(() => {
-            const spawnCount = Math.floor(spawnSpeed);
-            for (let i = 0; i < spawnCount; i++) {
-                spawnTarget();
-            }
-        }, 1000);
-    }
-    
-    // СТАРТ
-    showNotification('💥 НАЧИНАЙ ФАРМ! 💥');
-    startSpawning();
-    
-    // Начальный спавн
-    for (let i = 0; i < 3; i++) {
-        setTimeout(() => spawnTarget(), i * 300);
-    }
-</script>
-```
-
+    </script>
 </body>
 </html>
